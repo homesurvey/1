@@ -126,7 +126,8 @@
     <div id="error" class="notice hidden" role="alert"></div>
     <div id="fileFallback" class="file-fallback hidden">
       <p>To use the dashboard directly from your computer, choose the local CSV file:</p>
-      <label class="file-label">Choose data.csv<input id="csvFile" class="hidden" type="file" accept=".csv,text/csv"></label>
+      <label class="file-label">Choose CSV file<input id="csvFile" class="hidden" type="file" accept=".csv,text/csv" aria-describedby="csvRequirement"></label>
+      <span id="csvRequirement" class="hidden">Only CSV files are accepted.</span>
     </div>
     <div id="loading" class="loading">Loading dashboard...</div>
 
@@ -353,6 +354,9 @@
     function initializeDashboard(csv, sourceName) {
       const parsed = Papa.parse(csv, { header: true, skipEmptyLines: 'greedy' });
       if (parsed.errors.length && !parsed.data.length) throw new Error(parsed.errors[0].message);
+      const requiredFields = ['id', 'created_at', 'age', 'nationality'];
+      const missingFields = requiredFields.filter(field => !parsed.meta.fields?.includes(field));
+      if (missingFields.length) throw new Error(`This is not a valid survey CSV (missing: ${missingFields.join(', ')})`);
       allRows = parsed.data.filter(row => Object.values(row).some(Boolean)).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
       if (!allRows.length) throw new Error('The CSV contains no response records');
       filteredRows = [...allRows];
@@ -370,8 +374,8 @@
         initializeDashboard(csv, CSV_URL);
       } catch (error) {
         ui.loading.classList.add('hidden');
-        ui.error.textContent = `Could not load ${CSV_URL}. ${error.message}.`;
-        ui.error.classList.remove('hidden');
+        ui.error.textContent = '';
+        ui.error.classList.add('hidden');
         ui.fileFallback.classList.remove('hidden');
       }
     }
@@ -397,8 +401,16 @@
     ui.csvFile.addEventListener('change', async () => {
       const file = ui.csvFile.files[0];
       if (!file) return;
+      const hasCsvExtension = file.name.toLowerCase().endsWith('.csv');
+      const hasCsvType = !file.type || file.type === 'text/csv' || file.type === 'application/vnd.ms-excel';
+      if (!hasCsvExtension || !hasCsvType) {
+        ui.csvFile.value = '';
+        ui.error.textContent = 'Only CSV files are accepted. Please choose a file ending in .csv.';
+        ui.error.classList.remove('hidden');
+        return;
+      }
       try { initializeDashboard(await file.text(), file.name); }
-      catch (error) { ui.error.textContent = `Could not read the selected CSV. ${error.message}.`; ui.error.classList.remove('hidden'); }
+      catch (error) { ui.csvFile.value = ''; ui.error.textContent = `Could not read the selected CSV. ${error.message}.`; ui.error.classList.remove('hidden'); }
     });
     loadData();
   </script>
