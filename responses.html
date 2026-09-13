@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Second Home Survey Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.5.3/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --navy: #132a24; --green: #1f7653; --mint: #dff1e8; --sand: #f5f2eb;
+      --paper: #fff; --ink: #18241f; --muted: #6d7872; --line: #e1e7e3;
+      --danger: #a33b3b; --shadow: 0 14px 40px rgba(25, 49, 39, .07);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f6f8f6; color: var(--ink); font: 14px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .shell { width: min(1500px, calc(100% - 32px)); margin: auto; padding: 32px 0 56px; }
+    .topbar { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 24px; }
+    .eyebrow { margin: 0 0 5px; color: var(--green); font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); letter-spacing: -.04em; line-height: 1.05; }
+    .updated { margin: 7px 0 0; color: var(--muted); }
+    .actions { display: flex; gap: 9px; }
+    .btn { border: 1px solid var(--line); border-radius: 10px; background: var(--paper); color: var(--ink); padding: 10px 14px; font-weight: 700; }
+    .btn:hover { border-color: #b8c6bf; }
+    .btn.primary { border-color: var(--green); background: var(--green); color: white; }
+
+    .notice { margin: 24px 0; padding: 14px 16px; border: 1px solid #efcaca; border-radius: 11px; background: #fff5f5; color: var(--danger); }
+    .file-fallback { margin: -10px 0 24px; padding: 18px; border: 1px solid var(--line); border-radius: 11px; background: var(--paper); }
+    .file-fallback p { margin: 0 0 12px; color: var(--muted); }
+    .file-label { display: inline-block; border-radius: 9px; background: var(--green); color: white; padding: 10px 14px; font-weight: 750; cursor: pointer; }
+    .hidden { display: none !important; }
+    .loading { min-height: 50vh; display: grid; place-items: center; color: var(--muted); font-size: 16px; }
+
+    .filters { display: grid; grid-template-columns: 2fr repeat(4, minmax(145px, 1fr)); gap: 10px; margin-bottom: 18px; padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); box-shadow: var(--shadow); }
+    .control > span { display: block; margin: 0 0 6px; color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+    .control input { width: 100%; height: 42px; border: 1px solid var(--line); border-radius: 9px; background: white; padding: 0 11px; color: var(--ink); outline: none; }
+    .control input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(31, 118, 83, .1); }
+    .multi-filter { position: relative; }
+    .multi-filter summary { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 42px; padding: 0 11px; border: 1px solid var(--line); border-radius: 9px; background: white; cursor: pointer; list-style: none; white-space: nowrap; }
+    .multi-filter summary::-webkit-details-marker { display: none; }
+    .multi-filter summary::after { content: ''; width: 7px; height: 7px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); flex: 0 0 auto; }
+    .multi-filter[open] summary { border-color: var(--green); box-shadow: 0 0 0 3px rgba(31, 118, 83, .1); }
+    .multi-filter[open] summary::after { transform: rotate(225deg) translate(-2px, -1px); }
+    .multi-summary { overflow: hidden; text-overflow: ellipsis; }
+    .multi-options { position: absolute; z-index: 20; top: calc(100% + 6px); left: 0; width: max(100%, 220px); max-height: 280px; overflow: auto; padding: 7px; border: 1px solid var(--line); border-radius: 10px; background: white; box-shadow: 0 16px 38px rgba(20, 45, 35, .16); }
+    .multi-option { display: flex; align-items: flex-start; gap: 9px; padding: 8px; border-radius: 7px; cursor: pointer; }
+    .multi-option:hover { background: #f2f7f4; }
+    .multi-option input { width: 16px; height: 16px; margin: 2px 0 0; accent-color: var(--green); flex: 0 0 auto; }
+    .multi-option span { line-height: 1.3; }
+
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
+    .card { border: 1px solid var(--line); border-radius: 14px; background: var(--paper); box-shadow: var(--shadow); }
+    .kpi { padding: 20px; }
+    .kpi-label { color: var(--muted); font-size: 12px; font-weight: 750; letter-spacing: .04em; text-transform: uppercase; }
+    .kpi-value { margin-top: 7px; font-size: clamp(24px, 3vw, 34px); font-weight: 800; letter-spacing: -.035em; }
+    .kpi-note { margin-top: 3px; color: var(--green); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .charts { display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; margin-bottom: 18px; }
+    .chart-card { grid-column: span 4; min-height: 345px; padding: 18px; }
+    .chart-card.wide { grid-column: span 6; }
+    .card-title { margin: 0; font-size: 16px; }
+    .card-subtitle { margin: 3px 0 15px; color: var(--muted); font-size: 12px; }
+    .chart-wrap { position: relative; height: 265px; }
+
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin: 28px 0 13px; }
+    .section-head h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
+    .section-head p { margin: 3px 0 0; color: var(--muted); }
+    .breakdowns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
+    .breakdown-card { padding: 18px 20px 20px; }
+    .breakdown-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 13px; }
+    .breakdown-head h3 { margin: 0; font-size: 14px; }
+    .breakdown-head span { color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .rank-list { display: grid; gap: 9px; }
+    .rank-row { display: grid; grid-template-columns: minmax(115px, .85fr) minmax(120px, 1.3fr) auto; align-items: center; gap: 12px; min-width: 0; }
+    .rank-name { overflow: hidden; font-size: 12px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+    .rank-track { height: 9px; overflow: hidden; border-radius: 99px; background: #eeece7; }
+    .rank-fill { height: 100%; min-width: 3px; border-radius: inherit; background: var(--rank-color, var(--green)); }
+    .rank-value { min-width: 66px; text-align: right; font-size: 11px; font-weight: 800; white-space: nowrap; }
+    .no-breakdown { color: var(--muted); font-size: 12px; }
+
+    .table-card { overflow: hidden; }
+    .table-header { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 18px 20px; border-bottom: 1px solid var(--line); }
+    .table-scroll { overflow: auto; }
+    table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+    th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); text-align: left; }
+    th { position: sticky; top: 0; background: #fafcfb; color: var(--muted); font-size: 11px; letter-spacing: .05em; text-transform: uppercase; }
+    tbody tr { cursor: pointer; }
+    tbody tr:hover { background: #f6faf8; }
+    td { max-width: 230px; overflow: hidden; text-overflow: ellipsis; }
+    .pill { display: inline-block; margin: 1px 3px 1px 0; padding: 3px 7px; border-radius: 999px; background: var(--mint); color: #18583f; font-size: 12px; }
+    .pager { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 18px; color: var(--muted); }
+    .pager-buttons { display: flex; gap: 8px; }
+    .pager button { border: 1px solid var(--line); border-radius: 8px; background: white; padding: 7px 11px; }
+    .pager button:disabled { cursor: default; opacity: .4; }
+
+    dialog { width: min(850px, calc(100% - 28px)); max-height: 88vh; padding: 0; border: 0; border-radius: 16px; box-shadow: 0 28px 90px rgba(0,0,0,.25); }
+    dialog::backdrop { background: rgba(10, 25, 19, .52); backdrop-filter: blur(3px); }
+    .dialog-head { position: sticky; top: 0; display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; border-bottom: 1px solid var(--line); background: white; }
+    .dialog-head h2 { margin: 0; font-size: 20px; }
+    .close { width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 50%; background: white; font-size: 20px; }
+    .details { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line); }
+    .detail { min-width: 0; padding: 15px 20px; background: white; }
+    .detail dt { margin-bottom: 5px; color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+    .detail dd { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+    @media (max-width: 1000px) { .filters { grid-template-columns: repeat(2, 1fr); } .filters .search { grid-column: 1 / -1; } .chart-card, .chart-card.wide { grid-column: span 6; } }
+    @media (max-width: 680px) { .shell { width: min(100% - 20px, 1500px); padding-top: 22px; } .topbar { align-items: flex-start; flex-direction: column; } .filters, .kpis, .breakdowns { grid-template-columns: 1fr; } .filters .search { grid-column: auto; } .chart-card, .chart-card.wide { grid-column: 1 / -1; } .chart-card { min-height: 320px; } .details { grid-template-columns: 1fr; } .rank-row { grid-template-columns: minmax(90px, .8fr) 1fr auto; gap: 8px; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Research overview</p>
+        <h1>Second Home Survey</h1>
+        <p id="updated" class="updated">Loading response data...</p>
+      </div>
+      <div class="actions">
+        <button id="reset" class="btn" type="button">Reset filters</button>
+        <button id="export" class="btn primary" type="button">Export filtered CSV</button>
+      </div>
+    </header>
+
+    <div id="error" class="notice hidden" role="alert"></div>
+    <div id="fileFallback" class="file-fallback hidden">
+      <p>To use the dashboard directly from your computer, choose the local CSV file:</p>
+      <label class="file-label">Choose data.csv<input id="csvFile" class="hidden" type="file" accept=".csv,text/csv"></label>
+    </div>
+    <div id="loading" class="loading">Loading dashboard...</div>
+
+    <div id="dashboard" class="hidden">
+      <section id="filters" class="filters" aria-label="Dashboard filters">
+        <label class="control search"><span>Search all responses</span><input id="search" type="search" placeholder="Search nationality, preferences, amenities..."></label>
+        <label class="control"><span>Submitted from</span><input id="dateFrom" type="date"></label>
+        <label class="control"><span>Submitted to</span><input id="dateTo" type="date"></label>
+      </section>
+
+      <section class="kpis">
+        <article class="card kpi"><div class="kpi-label">Responses</div><div id="total" class="kpi-value">0</div><div id="totalNote" class="kpi-note">All records</div></article>
+        <article class="card kpi"><div class="kpi-label">Leading market</div><div id="market" class="kpi-value">-</div><div id="marketNote" class="kpi-note">No data</div></article>
+        <article class="card kpi"><div class="kpi-label">Top price range</div><div id="price" class="kpi-value">-</div><div id="priceNote" class="kpi-note">No data</div></article>
+        <article class="card kpi"><div class="kpi-label">Buying by 2027</div><div id="nearTerm" class="kpi-value">0%</div><div id="nearTermNote" class="kpi-note">0 respondents</div></article>
+      </section>
+
+      <section class="charts">
+        <article class="card chart-card"><h2 class="card-title">Age profile</h2><p class="card-subtitle">Respondent distribution</p><div class="chart-wrap"><canvas id="ageChart"></canvas></div></article>
+        <article class="card chart-card"><h2 class="card-title">Reason to buy</h2><p class="card-subtitle">Primary motivation</p><div class="chart-wrap"><canvas id="reasonChart"></canvas></div></article>
+        <article class="card chart-card"><h2 class="card-title">Property preference</h2><p class="card-subtitle">Preferred property type</p><div class="chart-wrap"><canvas id="propertyChart"></canvas></div></article>
+        <article class="card chart-card wide"><h2 class="card-title">Purchase timeline</h2><p class="card-subtitle">When respondents expect to buy</p><div class="chart-wrap"><canvas id="timingChart"></canvas></div></article>
+        <article class="card chart-card wide"><h2 class="card-title">Most wanted amenities</h2><p class="card-subtitle">Selections across all filtered responses</p><div class="chart-wrap"><canvas id="amenitiesChart"></canvas></div></article>
+      </section>
+
+      <div class="section-head"><div><h2>All response breakdowns</h2><p>Top answers within the current filter selection</p></div></div>
+      <section id="breakdowns" class="breakdowns" aria-label="Response KPI breakdowns"></section>
+
+      <section class="card table-card">
+        <div class="table-header"><div><h2 class="card-title">All responses</h2><p id="tableCount" class="card-subtitle" style="margin-bottom:0"></p></div></div>
+        <div class="table-scroll"><table><thead><tr id="tableHead"></tr></thead><tbody id="tableBody"></tbody></table></div>
+        <div class="pager"><span id="pageInfo"></span><div class="pager-buttons"><button id="previous" type="button">Previous</button><button id="next" type="button">Next</button></div></div>
+      </section>
+    </div>
+  </main>
+
+  <dialog id="detailsDialog"><div class="dialog-head"><h2>Response details</h2><button id="closeDialog" class="close" type="button" aria-label="Close">&times;</button></div><dl id="details" class="details"></dl></dialog>
+
+  <script>
+    const CSV_URL = 'api/data.csv';
+    const PAGE_SIZE = 25;
+    const COLORS = ['#1f7653','#e3a642','#4a7c95','#b96751','#775f91','#86a873','#d17b88','#557a6d'];
+    const FIELD_LABELS = {
+      id: 'Response ID', created_at: 'Submitted', full_name: 'Name', age: 'Age', nationality: 'Nationality',
+      social_status: 'Social status', no_of_children: 'Children', has_second_home: 'Has second home',
+      timing_to_buy: 'Purchase timeline', primary_reason: 'Reason to buy', property_type: 'Property type',
+      unit_size: 'Unit size', price_range: 'Price range', home_features: 'Home features',
+      staff_accommodation: 'Staff accommodation', premium_features: 'Premium features', exterior_colour: 'Exterior colour',
+      sport_amenities: 'Sport amenities', additional_amenities: 'Community amenities', managed_rental: 'Managed rental',
+      payment_plan: 'Payment plan', travel_to_destination: 'Travel method', community_mobility: 'Community mobility'
+    };
+    const TABLE_FIELDS = ['created_at','age','nationality','social_status','primary_reason','property_type','unit_size','price_range','timing_to_buy','payment_plan'];
+    const LIST_FIELDS = new Set(['home_features','premium_features','exterior_colour','sport_amenities','additional_amenities','community_mobility']);
+    const FILTERS = {
+      age: { field: 'age', label: 'Age' }, nationality: { field: 'nationality', label: 'Nationality' },
+      socialStatus: { field: 'social_status', label: 'Social status' }, children: { field: 'no_of_children', label: 'Children' },
+      secondHome: { field: 'has_second_home', label: 'Has second home' }, timing: { field: 'timing_to_buy', label: 'Purchase timeline' },
+      reason: { field: 'primary_reason', label: 'Primary reason' }, property: { field: 'property_type', label: 'Property type' },
+      unitSize: { field: 'unit_size', label: 'Unit size' }, priceRange: { field: 'price_range', label: 'Price range' },
+      paymentPlan: { field: 'payment_plan', label: 'Payment plan' }, staff: { field: 'staff_accommodation', label: 'Staff accommodation' },
+      managedRental: { field: 'managed_rental', label: 'Managed rental' }, travel: { field: 'travel_to_destination', label: 'Travel method' },
+      homeFeatures: { field: 'home_features', label: 'Home features', list: true }, premiumFeatures: { field: 'premium_features', label: 'Premium features', list: true },
+      exteriorColour: { field: 'exterior_colour', label: 'Exterior colour', list: true }, sportAmenities: { field: 'sport_amenities', label: 'Sport amenities', list: true },
+      communityAmenities: { field: 'additional_amenities', label: 'Community amenities', list: true }, mobility: { field: 'community_mobility', label: 'Community mobility', list: true }
+    };
+    const ui = Object.fromEntries(['updated','error','fileFallback','csvFile','loading','dashboard','filters','search','dateFrom','dateTo','breakdowns','reset','export','total','totalNote','market','marketNote','price','priceNote','nearTerm','nearTermNote','tableHead','tableBody','tableCount','pageInfo','previous','next','detailsDialog','details','closeDialog'].map(id => [id, document.getElementById(id)]));
+    let allRows = [], filteredRows = [], page = 0, charts = {};
+
+    function repairText(value) {
+      const text = String(value ?? '').trim();
+      if (!/[Ãâ]/.test(text)) return text;
+      try { return decodeURIComponent(escape(text)); } catch { return text; }
+    }
+    function parseList(value) {
+      const text = repairText(value);
+      if (!text) return [];
+      try { const parsed = JSON.parse(text); return Array.isArray(parsed) ? parsed.map(repairText) : [repairText(parsed)]; }
+      catch { return text.split(',').map(item => item.trim()).filter(Boolean); }
+    }
+    function displayValue(key, value) {
+      if (LIST_FIELDS.has(key)) return parseList(value).join(', ');
+      if (key === 'created_at' && value) { const date = new Date(value); return Number.isNaN(date.valueOf()) ? repairText(value) : date.toLocaleString(); }
+      return repairText(value) || '-';
+    }
+    function counts(rows, field, list = false) {
+      const result = new Map();
+      rows.forEach(row => {
+        const values = list ? parseList(row[field]) : [repairText(row[field])];
+        values.filter(Boolean).forEach(value => result.set(value, (result.get(value) || 0) + 1));
+      });
+      return [...result.entries()].sort((a,b) => b[1] - a[1]);
+    }
+    function createFilterControls() {
+      Object.entries(FILTERS).forEach(([id, config]) => {
+        const wrapper = document.createElement('div'); wrapper.className = 'control';
+        const title = document.createElement('span'); title.textContent = config.label;
+        const details = document.createElement('details'); details.id = id; details.className = 'multi-filter';
+        const summary = document.createElement('summary');
+        const summaryText = document.createElement('span'); summaryText.className = 'multi-summary'; summaryText.textContent = `All ${config.label.toLowerCase()}`;
+        const options = document.createElement('div'); options.className = 'multi-options';
+        summary.appendChild(summaryText); details.append(summary, options); wrapper.append(title, details); ui.filters.appendChild(wrapper); ui[id] = details;
+      });
+    }
+    function populateMultiFilter(filter, field, list) {
+      const options = filter.querySelector('.multi-options');
+      options.replaceChildren();
+      const values = allRows.flatMap(row => list ? parseList(row[field]) : [repairText(row[field])]);
+      [...new Set(values.filter(Boolean))].sort((a,b) => a.localeCompare(b)).forEach(value => {
+        const label = document.createElement('label'); label.className = 'multi-option';
+        const input = document.createElement('input'); input.type = 'checkbox'; input.value = value;
+        const text = document.createElement('span'); text.textContent = value;
+        label.append(input, text); options.appendChild(label);
+      });
+    }
+    function selectedValues(filter) { return new Set([...filter.querySelectorAll('input:checked')].map(input => input.value)); }
+    function updateFilterSummary(id) {
+      const filter = ui[id], selected = [...selectedValues(filter)], summary = filter.querySelector('.multi-summary');
+      summary.textContent = selected.length === 0 ? `All ${FILTERS[id].label.toLowerCase()}` : selected.length === 1 ? selected[0] : `${selected.length} selected`;
+      summary.title = selected.join(', ');
+    }
+    function percentage(count, total) { return total ? Math.round(count / total * 100) : 0; }
+
+    function applyFilters() {
+      const term = ui.search.value.trim().toLowerCase();
+      const selected = Object.fromEntries(Object.keys(FILTERS).map(id => [id, selectedValues(ui[id])]));
+      filteredRows = allRows.filter(row => {
+        for (const [id, config] of Object.entries(FILTERS)) {
+          if (!selected[id].size) continue;
+          const rowValues = config.list ? parseList(row[config.field]) : [repairText(row[config.field])];
+          if (!rowValues.some(value => selected[id].has(value))) return false;
+        }
+        if (ui.dateFrom.value && new Date(row.created_at) < new Date(`${ui.dateFrom.value}T00:00:00`)) return false;
+        if (ui.dateTo.value && new Date(row.created_at) > new Date(`${ui.dateTo.value}T23:59:59.999`)) return false;
+        return !term || Object.entries(row).some(([key,value]) => key !== 'raw_answers' && displayValue(key,value).toLowerCase().includes(term));
+      });
+      page = 0;
+      render();
+    }
+
+    function renderKpis() {
+      const market = counts(filteredRows, 'nationality')[0] || ['-', 0];
+      const price = counts(filteredRows, 'price_range')[0] || ['-', 0];
+      const near = filteredRows.filter(row => /2026|2027|immediate|now/i.test(repairText(row.timing_to_buy))).length;
+      ui.total.textContent = filteredRows.length.toLocaleString();
+      ui.totalNote.textContent = filteredRows.length === allRows.length ? 'All records' : `${allRows.length.toLocaleString()} total records`;
+      ui.market.textContent = market[0]; ui.marketNote.textContent = `${percentage(market[1], filteredRows.length)}% of responses`;
+      ui.price.textContent = price[0]; ui.priceNote.textContent = `${percentage(price[1], filteredRows.length)}% of responses`;
+      ui.nearTerm.textContent = `${percentage(near, filteredRows.length)}%`; ui.nearTermNote.textContent = `${near.toLocaleString()} respondents`;
+    }
+    function chart(id, type, entries, horizontal = false) {
+      if (charts[id]) charts[id].destroy();
+      const trimmed = entries.slice(0, 8);
+      charts[id] = new Chart(document.getElementById(id), {
+        type,
+        data: { labels: trimmed.map(x => x[0]), datasets: [{ data: trimmed.map(x => x[1]), backgroundColor: COLORS, borderWidth: type === 'doughnut' ? 0 : 0, borderRadius: type === 'bar' ? 6 : 0 }] },
+        options: { responsive: true, maintainAspectRatio: false, indexAxis: horizontal ? 'y' : 'x', plugins: { legend: { display: type === 'doughnut', position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, padding: 14 } } }, scales: type === 'bar' ? { x: { beginAtZero: true, grid: { display: !horizontal }, ticks: { precision: 0 } }, y: { beginAtZero: true, grid: { display: horizontal }, ticks: { precision: 0 } } } : {} }
+      });
+    }
+    function renderCharts() {
+      chart('ageChart', 'doughnut', counts(filteredRows, 'age'));
+      chart('reasonChart', 'doughnut', counts(filteredRows, 'primary_reason'));
+      chart('propertyChart', 'bar', counts(filteredRows, 'property_type'), true);
+      chart('timingChart', 'bar', counts(filteredRows, 'timing_to_buy'));
+      chart('amenitiesChart', 'bar', counts(filteredRows, 'additional_amenities', true), true);
+    }
+    function renderBreakdowns() {
+      ui.breakdowns.replaceChildren();
+      Object.values(FILTERS).forEach(config => {
+        const entries = counts(filteredRows, config.field, config.list);
+        const denominator = filteredRows.length;
+        const card = document.createElement('article'); card.className = 'card breakdown-card';
+        const head = document.createElement('div'); head.className = 'breakdown-head';
+        const title = document.createElement('h3'); title.textContent = config.label;
+        const top = document.createElement('span'); top.textContent = `Top ${Math.min(8, entries.length)}`;
+        head.append(title, top); card.appendChild(head);
+        const list = document.createElement('div'); list.className = 'rank-list';
+        if (!entries.length) { const empty = document.createElement('div'); empty.className = 'no-breakdown'; empty.textContent = 'No answers in this selection'; list.appendChild(empty); }
+        entries.slice(0, 8).forEach(([name, value], index) => {
+          const row = document.createElement('div'); row.className = 'rank-row';
+          const label = document.createElement('div'); label.className = 'rank-name'; label.textContent = name; label.title = name;
+          const track = document.createElement('div'); track.className = 'rank-track';
+          const fill = document.createElement('div'); fill.className = 'rank-fill'; fill.style.width = `${percentage(value, denominator)}%`; fill.style.setProperty('--rank-color', COLORS[index % COLORS.length]); track.appendChild(fill);
+          const number = document.createElement('div'); number.className = 'rank-value'; number.textContent = `${value.toLocaleString()} · ${percentage(value, denominator)}%`;
+          row.append(label, track, number); list.appendChild(row);
+        });
+        card.appendChild(list); ui.breakdowns.appendChild(card);
+      });
+    }
+    function renderTable() {
+      ui.tableHead.replaceChildren(); ui.tableBody.replaceChildren();
+      TABLE_FIELDS.forEach(field => { const th = document.createElement('th'); th.textContent = FIELD_LABELS[field]; ui.tableHead.appendChild(th); });
+      const start = page * PAGE_SIZE, rows = filteredRows.slice(start, start + PAGE_SIZE);
+      rows.forEach(row => {
+        const tr = document.createElement('tr'); tr.tabIndex = 0;
+        TABLE_FIELDS.forEach(field => { const td = document.createElement('td'); td.textContent = displayValue(field, row[field]); td.title = td.textContent; tr.appendChild(td); });
+        tr.addEventListener('click', () => showDetails(row));
+        tr.addEventListener('keydown', event => { if (event.key === 'Enter') showDetails(row); });
+        ui.tableBody.appendChild(tr);
+      });
+      const end = Math.min(start + PAGE_SIZE, filteredRows.length);
+      ui.tableCount.textContent = `${filteredRows.length.toLocaleString()} matching responses`;
+      ui.pageInfo.textContent = filteredRows.length ? `${start + 1}-${end} of ${filteredRows.length}` : 'No matching responses';
+      ui.previous.disabled = page === 0; ui.next.disabled = end >= filteredRows.length;
+    }
+    function render() { renderKpis(); renderCharts(); renderBreakdowns(); renderTable(); }
+    function showDetails(row) {
+      ui.details.replaceChildren();
+      Object.keys(FIELD_LABELS).forEach(field => {
+        const wrapper = document.createElement('div'); wrapper.className = 'detail';
+        const dt = document.createElement('dt'); dt.textContent = FIELD_LABELS[field];
+        const dd = document.createElement('dd');
+        const items = LIST_FIELDS.has(field) ? parseList(row[field]) : [];
+        if (items.length) items.forEach(item => { const pill = document.createElement('span'); pill.className = 'pill'; pill.textContent = item; dd.appendChild(pill); });
+        else dd.textContent = displayValue(field, row[field]);
+        wrapper.append(dt, dd); ui.details.appendChild(wrapper);
+      });
+      ui.detailsDialog.showModal();
+    }
+    function exportCsv() {
+      const csv = Papa.unparse(filteredRows);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+      const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'filtered-survey-responses.csv'; link.click(); URL.revokeObjectURL(link.href);
+    }
+    function initializeDashboard(csv, sourceName) {
+      const parsed = Papa.parse(csv, { header: true, skipEmptyLines: 'greedy' });
+      if (parsed.errors.length && !parsed.data.length) throw new Error(parsed.errors[0].message);
+      allRows = parsed.data.filter(row => Object.values(row).some(Boolean)).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+      if (!allRows.length) throw new Error('The CSV contains no response records');
+      filteredRows = [...allRows];
+      Object.entries(FILTERS).forEach(([id, config]) => { populateMultiFilter(ui[id], config.field, config.list); updateFilterSummary(id); });
+      const newest = allRows[0]?.created_at ? new Date(allRows[0].created_at).toLocaleString() : 'Unknown';
+      ui.updated.textContent = `${allRows.length.toLocaleString()} responses - latest submission ${newest} - ${sourceName}`;
+      ui.loading.classList.add('hidden'); ui.error.classList.add('hidden'); ui.fileFallback.classList.add('hidden'); ui.dashboard.classList.remove('hidden');
+      render();
+    }
+    async function loadData() {
+      try {
+        const response = await fetch(CSV_URL, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`CSV request returned ${response.status}`);
+        const csv = await response.text();
+        initializeDashboard(csv, CSV_URL);
+      } catch (error) {
+        ui.loading.classList.add('hidden');
+        ui.error.textContent = `Could not load ${CSV_URL}. ${error.message}.`;
+        ui.error.classList.remove('hidden');
+        ui.fileFallback.classList.remove('hidden');
+      }
+    }
+    createFilterControls();
+    ui.search.addEventListener('input', applyFilters);
+    ui.dateFrom.addEventListener('change', applyFilters);
+    ui.dateTo.addEventListener('change', applyFilters);
+    Object.keys(FILTERS).forEach(id => ui[id].querySelector('.multi-options').addEventListener('change', () => { updateFilterSummary(id); applyFilters(); }));
+    ui.reset.addEventListener('click', () => {
+      ui.search.value = '';
+      ui.dateFrom.value = ''; ui.dateTo.value = '';
+      Object.keys(FILTERS).forEach(id => { ui[id].querySelectorAll('input:checked').forEach(input => input.checked = false); ui[id].open = false; updateFilterSummary(id); });
+      applyFilters();
+    });
+    document.addEventListener('click', event => {
+      Object.keys(FILTERS).forEach(id => { if (!ui[id].contains(event.target)) ui[id].open = false; });
+    });
+    ui.export.addEventListener('click', exportCsv);
+    ui.previous.addEventListener('click', () => { if (page > 0) { page--; renderTable(); } });
+    ui.next.addEventListener('click', () => { if ((page + 1) * PAGE_SIZE < filteredRows.length) { page++; renderTable(); } });
+    ui.closeDialog.addEventListener('click', () => ui.detailsDialog.close());
+    ui.detailsDialog.addEventListener('click', event => { if (event.target === ui.detailsDialog) ui.detailsDialog.close(); });
+    ui.csvFile.addEventListener('change', async () => {
+      const file = ui.csvFile.files[0];
+      if (!file) return;
+      try { initializeDashboard(await file.text(), file.name); }
+      catch (error) { ui.error.textContent = `Could not read the selected CSV. ${error.message}.`; ui.error.classList.remove('hidden'); }
+    });
+    loadData();
+  </script>
+</body>
+</html>
