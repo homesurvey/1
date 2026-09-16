@@ -863,52 +863,6 @@
         overflow: hidden;
       }
     }
-    .language-toggle {
-      position: absolute;
-      top: 18px;
-      inset-inline-end: 20px;
-      z-index: 20;
-      display: inline-flex;
-      align-items: center;
-      gap: 9px;
-      color: var(--text);
-      font: 600 13px/1 Arial, sans-serif;
-      cursor: pointer;
-      user-select: none;
-    }
-    .language-toggle input { position: absolute; opacity: 0; pointer-events: none; }
-    .language-switch {
-      width: 42px;
-      height: 24px;
-      padding: 3px;
-      border-radius: 999px;
-      background: var(--progress-track);
-      box-shadow: inset 0 0 0 1px rgba(127,127,127,.22);
-      transition: background .2s ease;
-    }
-    .language-switch::after {
-      content: '';
-      display: block;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: #fff;
-      box-shadow: 0 1px 4px rgba(0,0,0,.25);
-      transition: transform .2s ease;
-    }
-    .language-toggle input:checked + .language-switch { background: var(--gold-light); }
-    .language-toggle input:checked + .language-switch::after { transform: translateX(18px); }
-    .language-toggle input:focus-visible + .language-switch { outline: 2px solid var(--gold-light); outline-offset: 3px; }
-    html[dir="rtl"] .language-toggle input:checked + .language-switch::after { transform: translateX(-18px); }
-    html[dir="rtl"] body { font-family: Tahoma, Arial, sans-serif; }
-    html[dir="rtl"] .screen-body,
-    html[dir="rtl"] .question-title,
-    html[dir="rtl"] .question-sub { text-align: right; }
-    html[dir="rtl"] .choice-chip,
-    html[dir="rtl"] .text-input,
-    html[dir="rtl"] .country-search,
-    html[dir="rtl"] .other-input { text-align: right; }
-    html[dir="rtl"] .choice-chip.is-image { text-align: center; }
   </style>
 </head>
 <body>
@@ -916,11 +870,6 @@
     <div class="brand-bar">
       <img class="brand-logo" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDI4LjEuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoJIHZpZXdCb3g9IjE5NSAzODUgNjA1IDIyMCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMTAwMCAxMDAwOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+Cgkuc3Qwe2ZpbGw6IzAwMjYzRTt9Cgkuc3Qxe2ZpbGw6dXJsKCNTVkdJRF8wMDAwMDE0MDAwNzM5NDM2MjMxNjg1MDYwMDAwMDAxMjg2NjQ0OTE5NDMwMjIzMTk0N18pO30KPC9zdHlsZT4KPHBhdGggaWQ9InBhdGg1ODZfMDAwMDAwMTg5MTgyMTkwODQzMzc2NzI0ODAwMDAwMDcxNTAwNzUzOTA4NzYxNTYwNDBfIiBjbGFzcz0ic3QwIiBkPSJNNDc4LjIsNDU4Ljl2LTI2LjVjMS40LTAuMiwyLjgtMC4zLDQuMS0wLjMKCWMxMS42LDAsMTYuNCw2LjYsMTYuNCwxNC4xYzAsNy4xLTQsMTIuNy0xNC41LDEyLjdINDc4LjJ6IE01MDcuNyw0NzguM2MtNC45LTEyLjMtNi45LTE2LjctMTcuNC0xNy45YzEyLjMtMS41LDE4LjItNy45LDE4LjItMTYuNAoJYzAtNy41LTUuMy0xNC44LTI0LjQtMTQuOGgtMTkuNXYxLjNjMy4xLDEsMy43LDMuOCwzLjcsMTAuNXY0MS4zYzAsNi43LTAuNyw5LjUtMy43LDEwLjV2MS4zaDE3LjJ2LTEuM2MtMy4xLTEtMy43LTMuOC0zLjctMTAuNQoJdi0yMC40aDUuNWM4LjEsMCw4LjYsMy41LDE0LjIsMTdjNC40LDEwLjgsNi4zLDE1LjgsMTQsMTUuOGMxLjYsMCw0LjUtMC4xLDYuNy0wLjd2LTEuM2MtMC41LDAuMS0wLjksMC4xLTEuNCwwLjEKCUM1MTMuNyw0OTIuOCw1MTIuNyw0OTAuNiw1MDcuNyw0NzguMyIvPgo8cGF0aCBpZD0icGF0aDU4OF8wMDAwMDAzMTkyMzU4MDIwNTA3MzgwNTMxMDAwMDAwMzE1NTcwNTIxMTI5NDQyMzcwNF8iIGNsYXNzPSJzdDAiIGQ9Ik03NzguNyw0NjcuMWMtMC4xLDguMy01LjIsMjEuMS0xNC4zLDIxLjEKCWMtNC4zLDAtOC42LTIuNS04LjYtOC42YzAtNy43LDguNi0xMC4xLDEzLTExLjNsOS45LTIuOUw3NzguNyw0NjcuMUw3NzguNyw0NjcuMXogTTc4OCw0ODIuM3YtMTcuOWMwLTExLjMtNS4zLTE3LjMtMTYuNS0xNy4zCgljLTguNCwwLTE1LjYsNC4zLTIwLjcsMTAuN2wwLjksMC44YzQuNy01LjcsOS44LTcuOSwxNS03LjljNi45LDAsMTEuOSwyLjYsMTIsMTEuOGwtMTAuMywzYy0xMS41LDMuMi0yMS4yLDcuOS0yMS4yLDE3LjQKCWMwLDcuOCw1LjcsMTIuMSwxMi42LDEyLjFjOS42LDAsMTYuMy04LjEsMTguOS0xOC44djE0LjJjMCwyLjQsMS4zLDMuNywzLjcsMy43aDkuM3YtMS4zQzc4OC42LDQ5MS43LDc4OCw0ODguOSw3ODgsNDgyLjMiLz4KPHBhdGggaWQ9InBhdGg1OTBfMDAwMDAwOTgyMTI0NDg2NTQxMTkwMzc0NjAwMDAwMTQ2OTk2NjkwMzk0MjA4MTY3ODRfIiBjbGFzcz0ic3QwIiBkPSJNNTM5LjIsNDUwLjZjNi4yLDAsMTEuMSwzLjgsMTIuNSwxMi41CgloLTI1LjRDNTI3LjcsNDU0LjcsNTM0LjEsNDUwLjYsNTM5LjIsNDUwLjZ6IE01NDUuMiw0ODcuNGMtMTEuOCwwLTE5LjItNy45LTE5LjItMjEuNGgzNS4zYzAtMTAuNC02LjctMTguOS0xOS4yLTE4LjkKCWMtMTIsMC0yNC40LDkuOC0yNC40LDI1LjZjMCwxNSwxMS43LDIyLjMsMjEuOSwyMi4zYzEwLjcsMCwxOC4xLTcuNCwyMi4zLTEzLjlsLTAuOC0wLjlDNTU3LjMsNDg0LjUsNTUyLDQ4Ny40LDU0NS4yLDQ4Ny40Ii8+CjxwYXRoIGlkPSJwYXRoNTkyXzAwMDAwMDE5NjU3NTMwNjMxMjkyMzI4ODgwMDAwMDEyNjc2MDYxMzUxNjcxMDAwMjUwXyIgY2xhc3M9InN0MCIgZD0iTTcxOC42LDQ1MC42YzYuMiwwLDExLjEsMy44LDEyLjUsMTIuNQoJaC0yNS4zQzcwNy4xLDQ1NC43LDcxMy41LDQ1MC42LDcxOC42LDQ1MC42eiBNNzI0LjUsNDg3LjRjLTExLjgsMC0xOS4yLTcuOS0xOS4yLTIxLjRoMzUuM2MwLTEwLjQtNi43LTE4LjktMTkuMi0xOC45CgljLTEyLDAtMjQuNCw5LjgtMjQuNCwyNS42YzAsMTUsMTEuNywyMi4zLDIxLjksMjIuM2MxMC43LDAsMTguMS03LjQsMjIuMy0xMy45bC0wLjgtMC45QzczNi43LDQ4NC41LDczMS40LDQ4Ny40LDcyNC41LDQ4Ny40Ii8+CjxwYXRoIGlkPSJwYXRoNTk0XzAwMDAwMTI2Mjg2NzM0NzU0NjcwODE5MDkwMDAwMDAyMDc0Njk5MjU3OTI0OTQ0MjcxXyIgY2xhc3M9InN0MCIgZD0iTTYwNCw0ODQuNWMtMi43LDIuOS02LjIsNS4xLTEwLjMsNS4xCgljLTEzLjMsMC0xNi40LTE1LjctMTYuNC0yNC41YzAtNS40LDMuMS0xNC40LDEyLjktMTQuNGM2LjcsMCwxMy44LDcuMywxMy44LDEzLjNWNDg0LjV6IE02MTMuNSw0ODIuM3YtNjIuNGwtMC45LTAuN2wtMTIuMiw1LjR2MS4zCgljMi4zLDEsMy43LDEuOSwzLjcsNy40djE2LjNjLTIuOC0xLjQtNi0yLjMtOS45LTIuM2MtMTYuMSwwLTI1LjgsMTEuMy0yNS44LDI1LjVjMCwxMS41LDgsMjIuMywxOS43LDIyLjVjNi45LDAuMiwxMi41LTQuNiwxNi04LjcKCXYzLjljMCwyLjQsMS4zLDMuNywzLjcsMy43aDkuNXYtMS4zQzYxNC4xLDQ5MS43LDYxMy41LDQ4OC45LDYxMy41LDQ4Mi4zIi8+CjxwYXRoIGlkPSJwYXRoNTk2XzAwMDAwMDQ0ODY0NTU5NzU1MTczNjI4MDMwMDAwMDE1NTUwMTY2MDM5ODM3NTEwODE5XyIgY2xhc3M9InN0MCIgZD0iTTY2OS4yLDQ1Ni4zYy03LjQtMy0xNi44LTYuMy0xNi44LTE0LjUKCWMwLTYuOSw3LjUtMTAuMSwxMy4yLTEwLjFjOC42LDAsMTcuMiw0LjUsMjAuNywxMy4xbDEtMC40bC0wLjQtMTJjLTQuOC0yLjQtMTAuOS0zLjktMTcuOC0zLjljLTE0LjUsMC0yMy44LDcuMS0yMy44LDE4LjYKCWMwLDEwLjcsOCwxMy45LDE3LjUsMTcuOWM3LjQsMywxOS40LDcuMiwxOS40LDE2LjNjMCw2LjktNy4yLDEwLjEtMTIuMywxMC4xYy0xMC40LDAtMjAuMy01LjktMjQuNS0xNy4xbC0xLjIsMC4ybDAuNCwxMy45CgljNC43LDMuNSwxMy4zLDYuNiwyMi45LDYuNmMxMC43LDAsMjIuMy03LDIyLjMtMTkuN0M2ODkuOSw0NjQuMSw2NzguNyw0NTkuOSw2NjkuMiw0NTYuMyIvPgo8cGF0aCBpZD0icGF0aDU5OF8wMDAwMDExOTExMzg3MDEyNDgxODk3OTQ4MDAwMDAwNTQwNTgwMDQ5OTE0NzEwMTg1NF8iIGNsYXNzPSJzdDAiIGQ9Ik02NDQuMiw1NzUuM2M3LjQsMCwxMS41LTEwLjQsMTEuNi0xNy4xCgl2LTEuNGwtOCwyLjNjLTMuNSwxLTEwLjUsMi45LTEwLjUsOS4yQzYzNy4zLDU3My4zLDY0MC44LDU3NS4zLDY0NC4yLDU3NS4zIE02NTUuOCw1NzcuMXYtMTEuNWMtMi4xLDguNy03LjUsMTUuMy0xNS4zLDE1LjMKCWMtNS42LDAtMTAuMi0zLjUtMTAuMi05LjljMC03LjcsNy45LTExLjUsMTcuMi0xNC4xbDguMy0yLjRjLTAuMS03LjQtNC4yLTkuNS05LjgtOS41Yy00LjIsMC04LjMsMS44LTEyLjIsNi40bC0wLjctMC43CgljNC4yLTUuMiwxMC04LjYsMTYuOC04LjZjOS4xLDAsMTMuNCw0LjksMTMuNCwxNC4xdjE0LjVjMCw1LjQsMC41LDcuNywzLDguNXYxLjFoLTcuNUM2NTYuOSw1ODAuMSw2NTUuOCw1NzksNjU1LjgsNTc3LjEiLz4KPHBhdGggaWQ9InBhdGg2MDBfMDAwMDAxNzY3NDcxNjE0Mzk4NzQ4NjkxMTAwMDAwMDUxMTQ2ODY5NjczNjI1NTIyMjRfIiBjbGFzcz0ic3QwIiBkPSJNNTIxLjEsNTc5LjFjMi41LTAuOCwzLTMuMSwzLTguNXYtMzkuOQoJYzAtNC40LTEuMS01LjItMy02di0xLjFsOS45LTQuNGwwLjgsMC42djUwLjhjMCw1LjQsMC41LDcuNywzLDguNXYxLjFoLTEzLjdWNTc5LjEiLz4KPHBhdGggaWQ9InBhdGg2MDJfMDAwMDAwMjYxNDQzNzQ5NDM0MDcwMjA0MDAwMDAwMTA1NjIxMDA3NTc4NjU2MzI2NjZfIiBjbGFzcz0ic3QwIiBkPSJNNjcxLjgsNTc5LjFjMi41LTAuOCwzLTMuMSwzLTguNXYtMzkuOQoJYzAtNC40LTEuMS01LjItMy02di0xLjFsOS45LTQuNGwwLjgsMC42djUwLjhjMCw1LjQsMC41LDcuNywzLDguNXYxLjFoLTEzLjdMNjcxLjgsNTc5LjEiLz4KPHBhdGggaWQ9InBhdGg2MDRfMDAwMDAwNjY1MTE4ODk5Mzg5NDM0MDY5ODAwMDAwMDMwODcwNTQ2NDMwNDY4ODk4OTNfIiBjbGFzcz0ic3QwIiBkPSJNNTAyLjYsNTU2LjZ2MS4xYzMuMiwwLjksMy45LDMsMy45LDguOXY2LjkKCWMtMS43LDMuMy02LjIsNC45LTEwLjksNC45Yy00LjksMC0xMC41LTItMTQuMy01LjdjLTUuNy02LjEtOC44LTE1LjQtOC43LTI0YzAuMS0xMi4yLDcuMi0xOS41LDE3LjYtMTkuNWM3LjcsMCwxNS43LDQuNiwxOC41LDExLjYKCWwwLjktMC4ybC0wLjMtOS45Yy0zLjktMi42LTExLjctMy43LTE2LjMtMy43Yy0xNi45LDAtMjguMywxMi4yLTI4LjMsMjYuN2MwLDE2LjUsMTEuMSwyNy4zLDI4LjQsMjcuM2M2LjMsMCwxNS41LTMuMSwyMS4yLTEwLjUKCXYtMTMuOUg1MDIuNiIvPgo8cGF0aCBpZD0icGF0aDYwNl8wMDAwMDEwMzk3Nzk1NTkwNzQ4MDk1MDA4MDAwMDAwMjczNzc3NDAwNDkxOTg3Njc1Ml8iIGNsYXNzPSJzdDAiIGQ9Ik01NjIuNSw1NzguNWMtNS4zLDAtOS40LTMuOC0xMS40LTcuMgoJYy0yLjMtNC4xLTMuOS05LjktMy45LTE0LjZjMC01LDIuMi0xMC45LDcuNS0xMi4yYzUuNC0xLjMsMTAuOCwyLjgsMTMuNSw3LjNjMi41LDQuMyw0LDEwLDQsMTQuNwoJQzU3Mi4zLDU3MC4xLDU3MC43LDU3OC41LDU2Mi41LDU3OC41IE01NTkuOSw1NDJjLTEwLjMsMC0yMC4xLDguMS0yMC4xLDIwLjNjMCwxMi44LDEwLjMsMTguNiwyMC4xLDE4LjZjOC45LDAsMjAtNy4zLDIwLTIwLjIKCUM1NzkuOSw1NDcuNSw1NjkuMiw1NDIsNTU5LjksNTQyIi8+CjxwYXRoIGlkPSJwYXRoNjA4XzAwMDAwMDMyNjUwMjE1MjYzODYyMDMxMjQwMDAwMDA4OTY0NTIwMzAyODcxNjk3MjkwXyIgY2xhc3M9InN0MCIgZD0iTTYwNy4xLDU3OS4zYy01LjcsMC0xMi4yLTYuNS0xMi4yLTEyLjQKCXYtMTguNmMyLjctMS43LDUuNS0yLjUsNy45LTIuNWMxMS4xLDAsMTQuNCwxNC45LDE0LjQsMjAuMUM2MTcuMSw1NzIuNyw2MTUsNTc5LjMsNjA3LjEsNTc5LjMgTTYwNy40LDU0MmMtNC4zLDAtOC43LDItMTIuNSw0LjQKCXYtMjYuNmwtMC44LTAuNmwtOS45LDQuNHYxLjFjMS45LDAuOCwzLDEuNiwzLDZ2NDkuNWgwLjhsMy4xLTQuOWMyLjgsMy4yLDcuNiw1LjYsMTMsNS42YzEyLjUsMCwyMC40LTkuMiwyMC40LTIwLjcKCUM2MjQuNSw1NTAuOCw2MTguMSw1NDIsNjA3LjQsNTQyIi8+CjxnPgoJPGc+CgkJPGc+CgkJCTxnPgoJCQkJCgkJCQkJPGxpbmVhckdyYWRpZW50IGlkPSJTVkdJRF8wMDAwMDE3MTY4Mzc5MDUzNTE0NjQwNDA5MDAwMDAxMzM1NzI4MTA0MDk2NzUzNDc0M18iIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4MT0iMTA1MC4zMzI0IiB5MT0iLTY2MTEuNTQ2NCIgeDI9IjEyMjAuMzY5OCIgeTI9Ii02Nzg0Ljk5NTYiIGdyYWRpZW50VHJhbnNmb3JtPSJtYXRyaXgoMSAwIDAgMSAtODE3LjUgNzE5OSkiPgoJCQkJCTxzdG9wICBvZmZzZXQ9IjAiIHN0eWxlPSJzdG9wLWNvbG9yOiNGNkUyQzciLz4KCQkJCQk8c3RvcCAgb2Zmc2V0PSIxIiBzdHlsZT0ic3RvcC1jb2xvcjojQjM5ODY4Ii8+CgkJCQk8L2xpbmVhckdyYWRpZW50PgoJCQkJCgkJCQkJPHBhdGggaWQ9IlNWR0lEXzAwMDAwMTE1NTA1Nzg0NTIxMDg2NTExMjYwMDAwMDAzMjk2MTkxMDc4MDUxMzAxMDI2XyIgc3R5bGU9ImZpbGw6dXJsKCNTVkdJRF8wMDAwMDE3MTY4Mzc5MDUzNTE0NjQwNDA5MDAwMDAxMzM1NzI4MTA0MDk2NzUzNDc0M18pOyIgZD0iCgkJCQkJTTIxOS42LDU1MS44YzEyLjksNC43LDI2LjMsMTQuOCwyNi42LDMzLjNjMi42LDIuMiw1LjIsNC4yLDgsNi4xYy0wLjEtMi0wLjItNC0wLjItNmMtMC4zLTI0LTE4LjctMzguMy0zOC45LTQzCgkJCQkJQzIxNi41LDU0NS42LDIxOCw1NDguNywyMTkuNiw1NTEuOCBNMjA3LjksNDg3YzIuMSwxLjksNC4xLDQsNi4xLDZjMi4xLDIuMiw0LDQsNS42LDUuM2M1LjgsNC44LDEzLDYuMSwyMCw3LjQKCQkJCQljNy42LDEuNCwxNC4xLDIuNiwxNy41LDcuOWMxLjksMi45LDIuMSw2LjEsMi4zLDkuNmMwLjIsMy44LDAuNiw4LjIsMy4xLDEyLjZjMy4yLDUuOCw2LjUsOC42LDkuNCwxMS4zYzIuMSwxLjksNCwzLjYsNi4yLDYuNQoJCQkJCWMwLjIsMC4yLDE2LjEsMjEuNCw1LjUsMzcuN2MtMC45LDEuNC0xLjgsMi4xLTIuNywyLjNjLTEuNSwwLjItMy40LTEuMi00LTEuOWMtMy4zLTMuNC02LjktMTguNy04LjMtMjguM3YtMC4yCgkJCQkJYy0zLjEtMTYuMS0xOC4yLTIyLjYtMzAuNC0yNy45bC0yLTAuOWMtMTEuOC01LjItMjMuMy0xMS4zLTI4LjMtMjEuM2MwLjYsNS4zLDEuNiwxMC43LDIuOSwxNS43YzYuMyw1LjMsMTQuMiw5LjMsMjIuMiwxMi44CgkJCQkJbDIsMC45YzExLjUsNSwyMy41LDEwLjIsMjUuOCwyMi4xYzAuNyw0LjUsNC4zLDI2LjIsMTAuNSwzMi42YzAuNSwwLjUsNC4zLDQuMiw5LjQsNC4yYzAuMywwLDAuNiwwLDEtMC4xCgkJCQkJYzIuMy0wLjIsNS43LTEuNSw4LjUtNS43YzUuNy04LjgsNi40LTE5LjcsMi4yLTMxLjdjLTMuMS04LjYtNy44LTE0LjktOC0xNS4xYy0yLjctMy41LTUuMS01LjctNy4zLTcuNQoJCQkJCWMtMi44LTIuNS01LjItNC42LTcuOC05LjNjLTEuNi0yLjktMS45LTUuOS0yLjEtOS4zYy0wLjItNC0wLjYtOC43LTMuNi0xMy4zYy01LjItOC4xLTE0LjEtOS43LTIyLjctMTEuMwoJCQkJCWMtNi4zLTEuMS0xMi4yLTIuMy0xNi41LTUuN2MtMS4yLTEtMy0yLjgtNC45LTQuOGMtMy4yLTMuMy02LjctNi45LTEwLjItOS40QzIwOC43LDQ4MSwyMDguMiw0ODQsMjA3LjksNDg3IE0zNTMuNyw0ODIuNQoJCQkJCWMtMy4xLDEwLjksMi4xLDIyLjYsNi41LDI3LjljMy4zLDQsNyw3LjEsMTAuNywxMC4yYzAuOCwwLjYsMS42LDEuNCwyLjQsMmM3LDYuMSwxMS41LDEzLjksMTQuNCwyNS40YzIuNywxMC44LDUuMiwyMSw1LjgsMzEuOQoJCQkJCWMwLDAuNCwwLDAuOSwwLjEsMS40YzIuNi0yLjQsNS00LjksNy4zLTcuNWMtMS05LjQtMy4yLTE4LjMtNS42LTI3LjdjLTMuMy0xMy4yLTguNS0yMi4zLTE2LjktMjkuNWMtMC44LTAuNy0xLjctMS40LTIuNS0yLjEKCQkJCQljLTMuNS0yLjktNi44LTUuNy05LjYtOS4xYy0zLjQtNC03LjEtMTMuMi00LjktMjAuOHYtMC4xYzAuNi0yLjMsMi44LTUuOSw3LjYtNS45YzAuMiwwLDAuMywwLDAuNSwwYzMuOCwwLjIsOS44LDMuNSwxNi4zLDE3LjgKCQkJCQlsMC4yLDAuNWMxMy4xLDI4LjIsMjUuNywzOC4yLDM1LjIsNDMuMWMxLTIuNCwxLjgtNC45LDIuNi03LjVjLTguNC00LjYtMTkuMS0xMy45LTMwLjctMzguOWwtMC4yLTAuNAoJCQkJCWMtNi42LTE0LjQtMTQuNC0yMS45LTIzLTIyLjRjLTAuMywwLTAuNiwwLTAuOSwwQzM2MC42LDQ3MC44LDM1NS4zLDQ3Ni44LDM1My43LDQ4Mi41IE0yMTUuNCw0NTguM2M1LjQsMC44LDEwLjksMS42LDE2LDMuMgoJCQkJCWMxNy44LDUuNiwyNy44LDE2LDM0LjIsMzUuOWMzLjMsMTAuMyw5LjMsMTkuNSwxNi43LDI1LjljMy4zLDIuOCw3LDQuNywxMC43LDYuNGMyLjMsMS4xLDQuNCwyLjEsNi40LDMuNAoJCQkJCWM5LDUuNywxNC41LDE2LjYsMTMuNiwyNy4xYy0wLjYsOC43LTUsMTYuNi05LjYsMjUuMWMtMC45LDEuNy0xLjksMy40LTIuNyw1Yy0yLjcsNS01LjYsMTEuNC02LjksMTguM2MyLjUsMC42LDUuMSwxLDcuNywxLjUKCQkJCQljMS00LjgsMy0xMC4xLDYuMi0xNi4xYzAuOS0xLjYsMS44LTMuMywyLjctNC45YzQuOC04LjgsOS44LTE3LjgsMTAuNi0yOC4zYzEtMTMuNC02LTI3LjItMTcuMy0zNC4zYy0yLjMtMS41LTQuOC0yLjctNy4xLTMuOAoJCQkJCWMtMy4zLTEuNi02LjUtMy4xLTktNS4yYy02LjUtNS41LTExLjUtMTMuNS0xNC40LTIyLjRjLTUuMS0xNS43LTEzLjYtMzIuOS0zOS4yLTQwLjljLTQuOS0xLjUtMTAuMS0yLjQtMTQuOS0zLjEKCQkJCQlDMjE3LjYsNDUzLjMsMjE2LjQsNDU1LjcsMjE1LjQsNDU4LjMgTTI0NC4xLDQxOGM5LDguMiwxNy44LDE4LjEsMjEuOCwyOS45YzEuMiwzLjcsMiw3LjYsMi44LDExLjdjMS40LDYuNywyLjcsMTMuNiw2LjMsMTkuOQoJCQkJCWM2LjEsMTAuNywxNi44LDE2LjgsMjcuMSwyMi43YzkuOCw1LjYsMTkuMSwxMC45LDI0LjEsMTkuNWM2LjEsMTAuMyw0LjgsMjIuOSwzLjUsMzYuMWMtMS4zLDEzLjQtMi43LDI3LjIsMy42LDM5LjUKCQkJCQljMS45LDMuOCw0LjUsNy4yLDYuOSwxMC4zYzAuMiwwLjMsMC42LDAuNywwLjgsMWMyLjctMC42LDUuNS0xLjMsOC4yLTIuMWMtMC45LTEuMy0xLjktMi41LTIuNy0zLjdjLTIuMy0zLjEtNC42LTYtNi4yLTkuMgoJCQkJCWMtNS4yLTEwLjMtNC0yMi40LTIuNy0zNS4xYzEuNC0xMy45LDIuOC0yOC4zLTQuNS00MC45Yy02LjEtMTAuNS0xNi43LTE2LjYtMjctMjIuNGMtOS45LTUuNy0xOS4yLTExLTI0LjItMTkuOAoJCQkJCWMtMy01LjItNC4yLTExLjItNS40LTE3LjZjLTAuOC00LjItMS43LTguNS0zLjEtMTIuN2MtNC40LTEzLjEtMTMuNi0yMy42LTIzLjEtMzIuNUMyNDgsNDE0LjUsMjQ2LDQxNi4yLDI0NC4xLDQxOAoJCQkJCSBNMzg0LjMsNDMxLjhjNCw3LjYsMjAuNSwyNy4zLDMwLjMsMzQuMmMwLjMsMC4yLDAuNywwLjYsMS4zLDFjMywyLjIsNi4xLDQuMyw5LDYuMmMtMS00LjEtMi4zLTguMi0zLjktMTIuMQoJCQkJCWMtMC4yLTAuMi0wLjQtMC4zLTAuNi0wLjVjLTAuNi0wLjQtMS0wLjgtMS40LTFjLTguNi02LjEtMjQuMy0yNC44LTI3LjktMzEuNGMtMi43LTUuMS00LjUtMTAuMi02LTE1LjMKCQkJCQljLTMuMS0yLjQtNi41LTQuOC05LjktNi44QzM3Ny41LDQxNC40LDM3OS43LDQyMy4xLDM4NC4zLDQzMS44IE0yNjcuNSw0MDEuOWMzLjUsNi41LDcuMiwxMi44LDExLjEsMTljMS45LDMsMy45LDUuOCw2LjgsOC4xCgkJCQkJYzMsMi4zLDYuNCwzLjUsOS42LDQuN2MyLjMsMC44LDQuNSwxLjYsNi40LDIuN2M3LjEsNC40LDguNywxMy4yLDEwLjYsMjMuM2MxLjQsNy43LDIuOCwxNS42LDYuOSwyMi4yYzMuMSw1LDcuNCw4LjksMTEuNiwxMi42CgkJCQkJYzUsNC40LDkuNyw4LjYsMTEuNiwxNC4xYzAuNiwxLjUsMSwzLjQsMS41LDUuMmMwLjYsMi40LDEuMSw0LjgsMiw3LjFjMy4yLDguNCwxMC4zLDEyLjEsMTQuNCwxNC4zbDAuNCwwLjIKCQkJCQljMTYuMyw4LjcsMTMuNiwyMi44LDEwLjQsMzkuMWMtMS4zLDYuNi0yLjcsMTMuNi0yLjMsMTkuOWMwLjEsMS41LDAuMiwyLjksMC41LDQuMWMyLjUtMS4zLDQuOS0yLjcsNy4zLTQuMmMwLTAuMSwwLTAuMiwwLTAuMgoJCQkJCWMtMC4yLTUuNCwxLTExLjUsMi4zLTE4LjFjMy4xLTE2LjEsNy0zNi0xNC40LTQ3LjVsLTAuNS0wLjJjLTMuOC0yLTguNi00LjUtMTAuOC0xMC4zYy0wLjYtMS44LTEuMi0zLjktMS43LTYuMQoJCQkJCWMtMC41LTItMS00LjEtMS42LTZjLTIuNi03LjUtOC4zLTEyLjUtMTMuOC0xNy40Yy00LTMuNS03LjctNi44LTEwLjItMTAuOGMtMy4zLTUuNC00LjYtMTIuNi01LjktMTkuNWMtMi0xMS00LTIyLjQtMTQuMS0yOC42CgkJCQkJYy0yLjYtMS42LTUuMi0yLjUtNy45LTMuNWMtMi43LTEtNS40LTEuOS03LjQtMy41Yy0xLjktMS41LTMuNS0zLjgtNS02LjFjLTMuOC01LjgtNy4zLTExLjktMTAuNy0xOAoJCQkJCUMyNzIuMiwzOTkuNiwyNjkuOCw0MDAuNywyNjcuNSw0MDEuOSBNMzU5LjIsNDI4LjdMMzU5LjIsNDI4LjdjMS41LDYuMSwzLDEyLjQsNi4xLDE4LjNjMy42LDYuNyw5LjIsMTIuOCwxNy4zLDE4LjkKCQkJCQljNC4xLDMuMSw4LjQsNS44LDEyLjYsOC41YzcuNCw0LjcsMTQuNCw5LjEsMjAuMiwxNWM1LjEsNS4yLDkuMywxMS41LDEyLjcsMTkuMmMwLjItMi43LDAuMy01LjQsMC4zLTguMmMwLTIuNy0wLjEtNS4yLTAuMi03LjgKCQkJCQljLTIuMS0zLjEtNC40LTYtNy4yLTguN2MtNi41LTYuNS0xNC4xLTExLjQtMjEuNi0xNi4xYy00LTIuNi04LjMtNS4yLTEyLjEtOC4yYy03LjItNS4zLTEyLTEwLjctMTUtMTYuMwoJCQkJCWMtMi42LTQuOS00LTEwLjUtNS40LTE2LjR2LTAuMWMtMi4yLTguOC00LjgtMTkuOC05LjgtMjkuOGMtMy42LTEuNC03LjMtMi41LTExLTMuNkMzNTIuNiw0MDMuMiwzNTUuOSw0MTUuMywzNTkuMiw0MjguNwoJCQkJCSBNMzE0LjgsMzg5LjljMC40LDAuNiwwLjgsMS4xLDEuMywxLjdjMi43LDMuNCw1LjksNi40LDksOS4zYzUuOSw1LjUsMTEuNSwxMC43LDEyLjQsMTcuNWMwLjIsMS45LDAuMiwzLjgsMC4yLDUuOQoJCQkJCWMtMC4xLDEuNS0wLjEsMywwLDQuNWMwLjIsNS43LDMuNCwxMS4zLDYuNSwxNi43YzUuNywxMCw2LjcsMTMuNiwyLjUsMTYuNmMtMS42LDEuMS0zLjMsMS00LjUsMC44Yy0yLjMtMC41LTQuNC0yLTUuNy00CgkJCQkJYy0xLjktMy4yLTIuNy03LjItMy40LTExLjRjLTAuMy0xLjgtMC42LTMuNi0xLTUuNGMtMy4xLTEzLjItMTAuNS0yNC0yMC4zLTI5LjhjLTIuOC0xLjctNS4yLTMtNy4zLTQuMQoJCQkJCWMtOS4zLTUuMS0xMC4xLTUuNi0xMi4zLTE1LjFjLTIuNiwwLjYtNS4xLDEuMy03LjUsMi4xYzMsMTIuMyw1LjcsMTQuMSwxNi4xLDE5LjljMiwxLjEsNC40LDIuNCw3LjEsNAoJCQkJCWM4LDQuNywxNC4xLDEzLjcsMTYuNiwyNC44YzAuNCwxLjYsMC42LDMuMiwxLDVjMC44LDQuOCwxLjcsOS42LDQuNCwxNC4xYzIuMywzLjksNi4zLDYuNywxMC43LDcuNmMxLDAuMiwyLjEsMC4zLDMuMSwwLjMKCQkJCQljMi43LDAsNS4zLTAuOCw3LjUtMi4zYzEwLjctNy40LDQuNC0xOC43LTAuMi0yNi44Yy0yLjYtNC42LTUuMi05LjQtNS41LTEzLjJjLTAuMS0xLjMsMC0yLjYsMC00YzAuMS0yLjMsMC4yLTQuOC0wLjItNy4zCgkJCQkJYy0xLjUtOS41LTguMi0xNS45LTE0LjktMjJjLTEuOC0xLjctMy42LTMuMy01LjItNWMtMi41LTAuMi01LTAuMi03LjUtMC4yQzMxNi43LDM4OS45LDMxNS44LDM4OS45LDMxNC44LDM4OS45Ii8+CgkJCTwvZz4KCQk8L2c+Cgk8L2c+CjwvZz4KPC9zdmc+Cg==" alt="Red Sea Global" width="132" height="48">
     </div>
-    <label class="language-toggle" for="arabicToggle">
-      <span id="languageLabel">العربية</span>
-      <input type="checkbox" id="arabicToggle" role="switch" aria-label="Enable Arabic language">
-      <span class="language-switch" aria-hidden="true"></span>
-    </label>
     <header class="progress-wrap" id="progressWrap" aria-hidden="true">
       <div class="progress-meta">
         <span id="stepLabel">Question 1 of 14</span>
@@ -1141,79 +1090,6 @@
     
     ];
 
-    const AR_QUESTIONS = {
-      age: 'العمر', nationality: 'الجنسية', social_status: 'الحالة الاجتماعية',
-      no_of_children: 'عدد الأطفال، إن وجد', has_second_home: 'هل لديك منزل ثانٍ حالياً؟',
-      primary_reason: 'السبب الرئيسي للشراء', property_type: 'نوع العقار المفضل',
-      unit_size: 'حجم الوحدة المفضل', price_range: 'النطاق السعري المفضل',
-      payment_plan: 'خطة الدفع المفضلة', home_features: 'أهم ميزات المنزل',
-      staff_accommodation: 'هل تحتاج إلى غرفة للخادمة أو السائق؟',
-      timing_to_buy: 'متى تتوقع شراء منزل ثانٍ؟',
-      premium_features: 'أي من الخيارات التالية قد تشتريه بسعر إضافي؟',
-      exterior_colour: 'لون الواجهة الخارجي المفضل', sport_amenities: 'أهم المرافق الرياضية',
-      additional_amenities: 'المرافق المجتمعية التي تتوقعها',
-      travel_to_destination: 'كيف ستسافر غالباً من الوجهة وإليها؟',
-      community_mobility: 'إذا كانت جميع الوجهات على بُعد 5–15 دقيقة سيراً، فكيف تفضل التنقل؟',
-      managed_rental: 'أخيراً، هل أنت مهتم ببرنامج تأجير مُدار؟'
-    };
-    const AR_OPTIONS = {
-      'Under 25':'أقل من 25','Single':'أعزب','Married':'متزوج','Self-owned':'مملوك شخصياً','Family-owned':'مملوك للعائلة','No':'لا',
-      'Family holidays':'عطلات عائلية','Investment':'استثمار','Both':'كلاهما','Apartment':'شقة','Townhouse':'تاون هاوس','Villa':'فيلا','Beach Villa':'فيلا شاطئية','No preference':'لا أفضلية',
-      'Studio':'استوديو','1BR':'غرفة نوم واحدة','2BR':'غرفتا نوم','3BR':'3 غرف نوم','4BR':'4 غرف نوم','5BR+':'5 غرف نوم أو أكثر',
-      'Upfront cash in full':'الدفع النقدي بالكامل','1–2 years':'1–2 سنة','3–5 years':'3–5 سنوات','5+ yrs':'5 سنوات أو أكثر',
-      'Outdoor Space':'مساحة خارجية','Balconies & Terraces':'شرفات وتراسات','Sea Views':'إطلالات بحرية','Park Views':'إطلالات على الحديقة','Privacy':'الخصوصية','Other':'أخرى','Other colours':'ألوان أخرى',
-      "A maid's room":'غرفة خادمة',"A driver's room":'غرفة سائق','Not required':'غير مطلوب','2030 onwards':'2030 فصاعداً',
-      'Installed Kitchen':'مطبخ مُركّب','Kitchen Appliances':'أجهزة المطبخ','Built-in Wardrobes':'خزائن مدمجة','Private Pool':'مسبح خاص',
-      'Rose':'وردي','Sand':'رملي','White':'أبيض','Grey':'رمادي','Padel':'بادل','Tennis':'تنس','Football':'كرة القدم','Basketball':'كرة السلة','Water sports':'رياضات مائية','Volleyball':'كرة الطائرة',
-      'Spa & Gym':'سبا ونادٍ رياضي',"Children's Club":'نادي الأطفال','Social Lounge':'صالة اجتماعية','Ladies Facilities':'مرافق للسيدات','Picnic Areas':'مناطق نزهات','Beach Club':'نادي شاطئي','Restaurants':'مطاعم','Cafes':'مقاهٍ','Retail':'متاجر',
-      'Car':'السيارة','Air':'الطائرة','Walking':'المشي','Cycling':'ركوب الدراجة','Private Buggy':'عربة خاصة','Shared Buggy / Community Shuttle':'عربة مشتركة / حافلة مجتمعية','Personal Car':'السيارة الشخصية',
-      'Yes':'نعم','Depends on return':'يعتمد على العائد','Depends on fees & flexibility':'يعتمد على الرسوم والمرونة'
-    };
-    const AR_UI = {
-      welcomeTitle: 'ساهم في تشكيل مجتمع ساحلي جديد في البحر الأحمر',
-      welcomeLead: 'تخيّل منزلاً ثانياً ساحلياً صُمم حول أسلوب الحياة الذي تريده بجوار البحر.',
-      letsGo: 'لنبدأ', continue: 'متابعة', back: 'رجوع', confirm: 'تأكيد الإرسال',
-      thankTitle: 'شكراً لك', thankLead: 'على مساهمتك في تشكيل مستقبل الحياة الساحلية في البحر الأحمر.',
-      select3: 'اختر حتى 3 خيارات', selectAll: 'اختر كل ما ينطبق',
-      searchCountries: 'ابحث عن دولة', noCountries: 'لم يتم العثور على دول',
-      specify: 'يرجى التحديد', typeHere: 'اكتب هنا', question: 'السؤال', of: 'من'
-    };
-    let savedLanguage = '';
-    try { savedLanguage = localStorage.getItem('surveyLanguage') || ''; } catch (_) {}
-    let language = savedLanguage === 'ar' ? 'ar' : 'en';
-    const arabicCountryNames = typeof Intl.DisplayNames === 'function'
-      ? new Intl.DisplayNames(['ar'], { type: 'region' }) : null;
-    const countryCodeByName = (() => {
-      if (typeof Intl.DisplayNames !== 'function') return {};
-      const englishNames = new Intl.DisplayNames(['en'], { type: 'region' });
-      const result = {};
-      for (let a = 65; a <= 90; a++) {
-        for (let b = 65; b <= 90; b++) {
-          const code = String.fromCharCode(a, b);
-          const name = englishNames.of(code);
-          if (name && name !== code) result[name] = code;
-        }
-      }
-      Object.assign(result, {
-        'Ivory Coast':'CI', 'Russia':'RU', 'South Korea':'KR', 'North Korea':'KP',
-        'Bolivia':'BO', 'Congo':'CG', 'Iran':'IR', 'Laos':'LA', 'Moldova':'MD',
-        'Syria':'SY', 'Tanzania':'TZ', 'Venezuela':'VE', 'Vietnam':'VN',
-        'Brunei':'BN', 'Cabo Verde':'CV', 'Micronesia':'FM', 'Palestine':'PS',
-        'Taiwan':'TW', 'Turkey':'TR', 'Vatican City':'VA'
-      });
-      return result;
-    })();
-
-    function localizedOption(value, fallback) {
-      return language === 'ar' ? (AR_OPTIONS[value] || fallback || value) : (fallback || value);
-    }
-
-    function localizedCountry(name) {
-      if (language !== 'ar' || !arabicCountryNames) return name;
-      const code = countryCodeByName[name];
-      return code ? arabicCountryNames.of(code) : name;
-    }
-
     const answers = QUESTIONS.map(q => q.type === 'multi' ? [] : '');
     const otherTexts = QUESTIONS.map(() => '');
 
@@ -1296,20 +1172,20 @@
       const rest = COUNTRIES.filter(c => c !== 'Saudi Arabia');
       const ordered = ['Saudi Arabia', ...rest];
       if (!q) return ordered;
-      return ordered.filter(c => c.toLowerCase().includes(q) || localizedCountry(c).toLowerCase().includes(q));
+      return ordered.filter(c => c.toLowerCase().includes(q));
     }
 
     function renderCountryList(listEl, selected, query) {
       if (!listEl) return;
       const items = filteredCountries(query);
       if (!items.length) {
-        listEl.innerHTML = `<div class="country-empty">${language === 'ar' ? AR_UI.noCountries : 'No countries found'}</div>`;
+        listEl.innerHTML = '<div class="country-empty">No countries found</div>';
         return;
       }
       listEl.innerHTML = items.map(c => {
         const on = selected === c ? ' is-on' : '';
         const safe = c.replace(/"/g, '&quot;');
-        return `<button type="button" class="country-item${on}" data-country="${safe}">${localizedCountry(c)}</button>`;
+        return `<button type="button" class="country-item${on}" data-country="${safe}">${c}</button>`;
       }).join('');
     }
 
@@ -1434,81 +1310,6 @@
     const screens = [buildWelcome(), ...QUESTIONS.map((_, i) => buildQuestion(i)), buildThankYou()];
     screens.forEach(s => viewport.appendChild(s));
 
-    const arabicToggle = document.getElementById('arabicToggle');
-    const languageLabel = document.getElementById('languageLabel');
-
-    function applyLanguage() {
-      const isArabic = language === 'ar';
-      document.documentElement.lang = language;
-      document.documentElement.dir = isArabic ? 'rtl' : 'ltr';
-      document.title = isArabic ? 'استبيان المنزل الثاني' : 'Second Home Survey';
-      arabicToggle.checked = isArabic;
-      arabicToggle.setAttribute('aria-label', isArabic ? 'إيقاف اللغة العربية' : 'Enable Arabic language');
-      languageLabel.textContent = isArabic ? 'English' : 'العربية';
-
-      const welcome = screens[0];
-      welcome.querySelector('h1').textContent = isArabic ? AR_UI.welcomeTitle : 'Help Shape a New Coastal Community at The Red Sea';
-      welcome.querySelector('.lead').textContent = isArabic ? AR_UI.welcomeLead : 'Imagine a coastal second home designed around how you want to live by the sea.';
-      welcome.querySelector('[data-action="next"]').textContent = isArabic ? AR_UI.letsGo : "Let's Go";
-
-      QUESTIONS.forEach((q, i) => {
-        const screen = screens[i + 1];
-        const title = isArabic ? (AR_QUESTIONS[q.key] || q.title) : q.title;
-        const titleEl = screen.querySelector('.question-title');
-        if (titleEl) titleEl.textContent = title;
-        const sub = screen.querySelector('.question-sub');
-        if (sub && q.sub) sub.textContent = isArabic
-          ? (q.sub === 'Select up to 3' ? AR_UI.select3 : AR_UI.selectAll) : q.sub;
-
-        screen.querySelectorAll('.choice-chip').forEach((chip, optionIndex) => {
-          const opt = q.options[optionIndex];
-          const value = optionValue(opt);
-          const englishLabel = optionLabel(opt);
-          const label = localizedOption(value, isArabic ? AR_OPTIONS[englishLabel] : englishLabel);
-          const labelEl = chip.querySelector('.choice-label');
-          if (labelEl) labelEl.textContent = label;
-          else chip.textContent = label;
-          chip.setAttribute('aria-label', label);
-          const img = chip.querySelector('img');
-          if (img) img.alt = label;
-        });
-
-        const textInput = screen.querySelector('.text-input');
-        if (textInput) {
-          textInput.placeholder = isArabic ? AR_UI.typeHere : (q.placeholder || 'Type here');
-          textInput.setAttribute('aria-label', title);
-        }
-        const otherInput = screen.querySelector('.other-input');
-        if (otherInput) {
-          otherInput.placeholder = isArabic ? AR_UI.specify : 'Please specify';
-          otherInput.setAttribute('aria-label', isArabic ? AR_UI.specify : 'Please specify other');
-        }
-        screen.querySelectorAll('.country-search').forEach(input => {
-          input.placeholder = isArabic ? AR_UI.searchCountries : 'Search countries';
-          input.setAttribute('aria-label', input.placeholder);
-        });
-        screen.querySelectorAll('.country-list').forEach(list => {
-          const search = list.previousElementSibling;
-          const answer = answers[i] || '';
-          renderCountryList(list, answer, search ? search.value : '');
-        });
-        const back = screen.querySelector('[data-action="back"]');
-        if (back) back.textContent = isArabic ? AR_UI.back : 'Back';
-      });
-
-      const thank = screens[screens.length - 1];
-      thank.querySelector('h1').textContent = isArabic ? AR_UI.thankTitle : 'Thank you';
-      thank.querySelector('.lead').textContent = isArabic ? AR_UI.thankLead : 'For your contribution in helping shape the future of coastal living at The Red Sea.';
-      QUESTIONS.forEach((_, i) => syncQuestionUI(i));
-      updateProgress();
-    }
-
-    arabicToggle.addEventListener('change', () => {
-      language = arabicToggle.checked ? 'ar' : 'en';
-      try { localStorage.setItem('surveyLanguage', language); } catch (_) {}
-      applyLanguage();
-    });
-
     const thankStep = screens.length - 1;
     const firstQ = 1;
     const lastQ = QUESTIONS.length;
@@ -1556,9 +1357,7 @@
       if (q.type === 'text') {
         const textInput = screen.querySelector('.text-input');
         if (textInput && textInput.value !== answer) textInput.value = answer || '';
-        continueBtn.textContent = isLastVisibleQuestion(qIndex)
-          ? (language === 'ar' ? AR_UI.confirm : 'Confirm Submission')
-          : (language === 'ar' ? AR_UI.continue : 'Continue');
+        continueBtn.textContent = isLastVisibleQuestion(qIndex) ? 'Confirm Submission' : 'Continue';
         continueBtn.hidden = false;
         continueBtn.disabled = !textAnswerValid(q, answer);
         return;
@@ -1568,9 +1367,7 @@
         const countrySearch = screen.querySelector('.country-search');
         const countryList = screen.querySelector('.country-list');
         renderCountryList(countryList, answer || '', countrySearch ? countrySearch.value : '');
-        continueBtn.textContent = isLastVisibleQuestion(qIndex)
-          ? (language === 'ar' ? AR_UI.confirm : 'Confirm Submission')
-          : (language === 'ar' ? AR_UI.continue : 'Continue');
+        continueBtn.textContent = isLastVisibleQuestion(qIndex) ? 'Confirm Submission' : 'Continue';
         continueBtn.hidden = false;
         continueBtn.disabled = !(answer || '').trim();
         return;
@@ -1636,9 +1433,7 @@
       }
 
       const isLast = isLastVisibleQuestion(qIndex);
-      continueBtn.textContent = isLast
-        ? (language === 'ar' ? AR_UI.confirm : 'Confirm Submission')
-        : (language === 'ar' ? AR_UI.continue : 'Continue');
+      continueBtn.textContent = isLast ? 'Confirm Submission' : 'Continue';
 
       if (q.type === 'multi') {
         continueBtn.hidden = false;
@@ -1672,9 +1467,7 @@
       const pos = Math.max(1, visible.indexOf(qIndex) + 1);
       const total = visible.length;
       const pct = Math.round((pos / total) * 100);
-      stepLabel.textContent = language === 'ar'
-        ? AR_UI.question + ' ' + pos + ' ' + AR_UI.of + ' ' + total
-        : 'Question ' + pos + ' of ' + total;
+      stepLabel.textContent = 'Question ' + pos + ' of ' + total;
       stepPct.textContent = pct + '%';
       progressFill.style.width = pct + '%';
     }
@@ -1852,7 +1645,6 @@
 
     screens[0].classList.add('active');
     updateProgress();
-    applyLanguage();
   })();
   </script>
 </body>
