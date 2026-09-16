@@ -1440,7 +1440,7 @@
       document.title = isArabic ? 'استبيان المنزل الثاني' : 'Second Home Survey';
       arabicToggle.checked = isArabic;
       arabicToggle.setAttribute('aria-label', isArabic ? 'إيقاف اللغة العربية' : 'Enable Arabic language');
-      languageLabel.textContent = isArabic ? 'English' : 'العربية';
+      languageLabel.textContent = isArabic ? 'EN' : 'AR';
       const welcome = screens[0];
       welcome.querySelector('h1').textContent = isArabic ? AR_UI.welcomeTitle : 'Help Shape a New Coastal Community at The Red Sea';
       welcome.querySelector('.lead').textContent = isArabic ? AR_UI.welcomeLead : 'Imagine a coastal second home designed around how you want to live by the sea.';
