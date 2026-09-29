@@ -293,13 +293,53 @@
       ui.price.textContent = price[0]; ui.priceNote.textContent = `${percentage(price[1], filteredRows.length)}% of responses`;
       ui.nearTerm.textContent = `${percentage(near, filteredRows.length)}%`; ui.nearTermNote.textContent = `${near.toLocaleString()} respondents`;
     }
+    const percentageLabels = {
+      id: 'percentageLabels',
+      afterDatasetsDraw(chartInstance) {
+        if (chartInstance.config.type !== 'bar') return;
+        const percentages = chartInstance.options.plugins.percentageLabels?.values || [];
+        const horizontal = chartInstance.options.indexAxis === 'y';
+        const meta = chartInstance.getDatasetMeta(0);
+        const { ctx } = chartInstance;
+        ctx.save();
+        ctx.fillStyle = '#334155';
+        ctx.font = '600 11px Inter, system-ui, sans-serif';
+        meta.data.forEach((bar, index) => {
+          if (!bar || percentages[index] == null) return;
+          ctx.textAlign = horizontal ? 'left' : 'center';
+          ctx.textBaseline = horizontal ? 'middle' : 'bottom';
+          ctx.fillText(`${percentages[index]}%`, horizontal ? bar.x + 6 : bar.x, horizontal ? bar.y : bar.y - 6);
+        });
+        ctx.restore();
+      }
+    };
+
     function chart(id, type, entries, horizontal = false) {
       if (charts[id]) charts[id].destroy();
       const trimmed = entries.slice(0, 8);
+      const total = filteredRows.length;
+      const labels = trimmed.map(([label, value]) => type === 'doughnut' ? `${label} (${percentage(value, total)}%)` : label);
+      const values = trimmed.map(([, value]) => value);
+      const percentages = values.map(value => percentage(value, total));
       charts[id] = new Chart(document.getElementById(id), {
         type,
-        data: { labels: trimmed.map(x => x[0]), datasets: [{ data: trimmed.map(x => x[1]), backgroundColor: COLORS, borderWidth: type === 'doughnut' ? 0 : 0, borderRadius: type === 'bar' ? 6 : 0 }] },
-        options: { responsive: true, maintainAspectRatio: false, indexAxis: horizontal ? 'y' : 'x', plugins: { legend: { display: type === 'doughnut', position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, padding: 14 } } }, scales: type === 'bar' ? { x: { beginAtZero: true, grid: { display: !horizontal }, ticks: { precision: 0 } }, y: { beginAtZero: true, grid: { display: horizontal }, ticks: { precision: 0 } } } : {} }
+        data: { labels, datasets: [{ data: values, backgroundColor: COLORS, borderWidth: 0, borderRadius: type === 'bar' ? 6 : 0 }] },
+        plugins: [percentageLabels],
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          indexAxis: horizontal ? 'y' : 'x',
+          layout: { padding: type === 'bar' ? (horizontal ? { right: 34 } : { top: 20 }) : {} },
+          plugins: {
+            legend: { display: type === 'doughnut', position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, padding: 14 } },
+            percentageLabels: { values: percentages },
+            tooltip: { callbacks: { label: context => `${trimmed[context.dataIndex][0]}: ${context.raw.toLocaleString()} (${percentages[context.dataIndex]}%)` } }
+          },
+          scales: type === 'bar' ? {
+            x: { beginAtZero: true, grace: horizontal ? '15%' : 0, grid: { display: !horizontal }, ticks: { precision: 0 } },
+            y: { beginAtZero: true, grace: horizontal ? 0 : '15%', grid: { display: horizontal }, ticks: { precision: 0 } }
+          } : {}
+        }
       });
     }
     function renderCharts() {
