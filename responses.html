@@ -196,6 +196,22 @@
     const ui = Object.fromEntries(['updated','error','fileFallback','csvFile','loading','dashboard','filters','search','dateFrom','dateTo','breakdowns','reset','export','total','totalNote','market','marketNote','price','priceNote','nearTerm','nearTermNote','tableHead','tableBody','tableCount','pageInfo','previous','next','detailsDialog','details','closeDialog'].map(id => [id, document.getElementById(id)]));
     let allRows = [], filteredRows = [], page = 0, charts = {};
 
+    function setText(element, value) {
+      if (element) element.textContent = value;
+    }
+    function getUpdatedStatus() {
+      if (ui.updated) return ui.updated;
+      const headerContent = document.querySelector('.topbar > div');
+      if (!headerContent) return null;
+      const status = document.createElement('p');
+      status.id = 'updated';
+      status.className = 'updated';
+      status.setAttribute('aria-live', 'polite');
+      headerContent.appendChild(status);
+      ui.updated = status;
+      return status;
+    }
+
     function repairText(value) {
       const text = String(value ?? '').trim();
       if (!/[Ãâ]/.test(text)) return text;
@@ -362,12 +378,18 @@
       filteredRows = [...allRows];
       Object.entries(FILTERS).forEach(([id, config]) => { populateMultiFilter(ui[id], config.field, config.list); updateFilterSummary(id); });
       const newest = allRows[0]?.created_at ? new Date(allRows[0].created_at).toLocaleString() : 'Unknown';
-      // Keep CSV loading functional even if this optional status element is removed from a customized layout.
-      if (ui.updated) ui.updated.textContent = `${allRows.length.toLocaleString()} responses - latest submission ${newest} - ${sourceName}`;
+      setText(getUpdatedStatus(), `${allRows.length.toLocaleString()} responses - latest submission ${newest} - ${sourceName}`);
       ui.loading.classList.add('hidden'); ui.error.classList.add('hidden'); ui.fileFallback.classList.add('hidden'); ui.dashboard.classList.remove('hidden');
       render();
     }
     async function loadData() {
+      if (window.location.protocol === 'file:') {
+        ui.loading.classList.add('hidden');
+        ui.error.textContent = 'Safari cannot automatically read a neighboring CSV when this page is opened directly from your computer. Open this folder through a local web server to load the default CSV automatically, or choose the CSV file below.';
+        ui.error.classList.remove('hidden');
+        ui.fileFallback.classList.remove('hidden');
+        return;
+      }
       try {
         const response = await fetch(CSV_URL, { cache: 'no-store' });
         if (!response.ok) throw new Error(`CSV request returned ${response.status}`);
