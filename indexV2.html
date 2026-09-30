@@ -1000,7 +1000,7 @@
         key: 'has_second_home',
         type: 'single',
         icon: '<path d="M3 21h18"/><path d="M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6"/>',
-        options: ['Self-owned', 'Family-owned', 'No']
+        options: ['Yes', 'No']
       },
 {
         title: 'Primary Reason to Buy',
@@ -1025,8 +1025,9 @@
         optionsFilter: () => {
           const propertyType = answerByKey('property_type');
           if (propertyType === 'Apartment' || propertyType === 'No preference') {
-            return ['Studio', '1BR', '2BR', '3BR', '4BR', '5BR+'];
+            return ['Studio', '1BR', '2BR', '3BR', '4BR'];
           }
+          if (propertyType === 'Townhouse') return ['2BR', '3BR', '4BR'];
           return ['2BR', '3BR', '4BR', '5BR+'];
         }
       },
@@ -1042,7 +1043,7 @@
         key: 'payment_plan',
         type: 'single',
         icon: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M8 15h4"/>',
-        options: ['Upfront cash in full', '1–2 years', '3–5 years', '5+ yrs']
+        options: ['Cash upfront', '1–2 years', '3–5 years', '5+ years']
       },
 {
         title: 'Top Home Features',
@@ -1058,15 +1059,15 @@
         key: 'staff_accommodation',
         type: 'single',
         icon: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
-        options: ["A maid's room", "A driver's room", 'Both', 'Not required'],
-        skipIf: () => ['Studio', '1BR'].includes(answerByKey('unit_size'))
+        options: ["Maid's room", "Driver's room", 'Both', 'Not required'],
+        skipIf: () => answerByKey('property_type') !== 'Apartment' || ['Studio', '1BR'].includes(answerByKey('unit_size'))
       },
 {
         title: 'How Soon Would You Be Interested in Buying a Second Home?',
         key: 'timing_to_buy',
         type: 'single',
         icon: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
-        options: ['2026 – 2027', '2028 – 2029', '2030 onwards']
+        options: ['2026–2027', '2028–2029', '2030 onwards']
       },
 {
         title: 'Which of the Following Would You Be Willing to Buy at a Premium?',
@@ -1095,8 +1096,6 @@
         title: 'Top Sport Amenities',
         key: 'sport_amenities',
         type: 'multi',
-        max: 3,
-        sub: 'Select up to 3',
         icon: '<circle cx="12" cy="12" r="9"/><path d="M12 3a12 12 0 0 1 0 18"/><path d="M12 3a12 12 0 0 0 0 18"/><path d="M3 12h18"/>',
         options: ['Padel', 'Tennis', 'Football', 'Basketball', 'Water sports', 'Volleyball', 'Other']
       },
@@ -1107,7 +1106,8 @@
         sub: 'Select all that apply',
         icon: '<path d="M10 3v8a4 4 0 0 0 8 0V3"/><path d="M14 3v8"/><path d="M4 12h16"/><path d="M12 12v9"/>',
         options: [
-          'Spa & Gym',
+          'Spa',
+          'Gym',
           "Children's Club",
           'Social Lounge',
           'Ladies Facilities',
@@ -1132,7 +1132,7 @@
         type: 'multi',
         sub: 'Select all that apply',
         icon: '<circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><path d="M8 21v-4a4 4 0 0 1 8 0v4"/>',
-        options: ['Walking', 'Cycling', 'Private Buggy', 'Shared Buggy / Community Shuttle', 'Personal Car']
+        options: ['Walking', 'Cycling', 'Private Buggy', 'Personal Car', 'Shared Buggy or Shuttle']
       },
 {
         title: 'Lastly, Are You Interested in a Managed Rental Programme?',
@@ -1142,36 +1142,37 @@
         options: [
           'Yes',
           'Depends on return',
-          'Depends on fees & flexibility',
+          'Depends on fees',
           'No'
-        ]
+        ],
+        skipIf: () => !['Investment', 'Both'].includes(answerByKey('primary_reason'))
       }
     
     ];
 
     const AR_QUESTIONS = {
       age:'العمر', nationality:'الجنسية', social_status:'الحالة الاجتماعية', no_of_children:'عدد الأطفال، إن وجد',
-      has_second_home:'هل لديك منزل ثانٍ حالياً؟', primary_reason:'السبب الرئيسي للشراء', property_type:'نوع العقار المفضل',
-      unit_size:'حجم الوحدة المفضل', price_range:'النطاق السعري المفضل', payment_plan:'خطة الدفع المفضلة',
-      home_features:'أهم ميزات المنزل', staff_accommodation:'هل تحتاج إلى غرفة للخادمة أو السائق؟',
-      timing_to_buy:'متى تتوقع شراء منزل ثانٍ؟', premium_features:'أي من الخيارات التالية قد تشتريه بسعر إضافي؟',
-      exterior_colour:'لون الواجهة الخارجي المفضل', sport_amenities:'أهم المرافق الرياضية',
-      additional_amenities:'المرافق المجتمعية التي تتوقعها', travel_to_destination:'كيف ستسافر غالباً من الوجهة وإليها؟',
-      community_mobility:'إذا كانت جميع الوجهات على بُعد 5–15 دقيقة سيراً، فكيف تفضل التنقل؟',
-      managed_rental:'أخيراً، هل أنت مهتم ببرنامج تأجير مُدار؟'
+      has_second_home:'هل تمتلك حاليًا مسكنًا ثانيًا؟', primary_reason:'السبب الرئيسي للشراء', property_type:'ما نوع الوحدة السكنية التي تفضلها؟',
+      unit_size:'كم عدد غرف النوم التي تفضلها؟', price_range:'النطاق السعري المفضل', payment_plan:'خطة الدفع المفضلة',
+      home_features:'ما أهم المزايا التي تفضلها في المسكن؟', staff_accommodation:'ما نوع الغرف المخصصة للعمالة المنزلية التي تفضلها؟',
+      timing_to_buy:'الفترة المتوقعة للشراء', premium_features:'أي من الخيارات التالية قد ترغب في إضافته مقابل تكلفة إضافية؟',
+      exterior_colour:'لون الواجهة المفضل', sport_amenities:'ما المرافق الرياضية التي تفضلها؟',
+      additional_amenities:'ما المرافق التي تتوقع توفرها في المجمع السكني؟', travel_to_destination:'وسيلة الوصول إلى الوجهة',
+      community_mobility:'ما هي وسيلة التنقل التي تفضل استخدامها داخل الوجهة؟',
+      managed_rental:'في حال توفر برنامج لتأجير الوحدات السكنية، هل ترغب في الاشتراك فيه؟'
     };
     const AR_OPTIONS = {
-      'Under 25':'أقل من 25','Single':'أعزب','Married':'متزوج','Self-owned':'مملوك شخصياً','Family-owned':'مملوك للعائلة','No':'لا',
-      'Family holidays':'عطلات عائلية','Investment':'استثمار','Both':'كلاهما','Apartment':'شقة','Townhouse':'تاون هاوس','Villa':'فيلا','Beach Villa':'فيلا شاطئية','No preference':'لا أفضلية',
-      'Studio':'استوديو','1BR':'غرفة نوم واحدة','2BR':'غرفتا نوم','3BR':'3 غرف نوم','4BR':'4 غرف نوم','5BR+':'5 غرف نوم أو أكثر',
-      'Upfront cash in full':'الدفع النقدي بالكامل','1–2 years':'1–2 سنة','3–5 years':'3–5 سنوات','5+ yrs':'5 سنوات أو أكثر',
-      'Outdoor Space':'مساحة خارجية','Balconies & Terraces':'شرفات وتراسات','Sea Views':'إطلالات بحرية','Park Views':'إطلالات على الحديقة','Privacy':'الخصوصية','Other':'أخرى','Other colours':'ألوان أخرى',
-      "A maid's room":'غرفة خادمة',"A driver's room":'غرفة سائق','Not required':'غير مطلوب','2030 onwards':'2030 فصاعداً',
-      'Installed Kitchen':'مطبخ مُركّب','Kitchen Appliances':'أجهزة المطبخ','Built-in Wardrobes':'خزائن مدمجة','Private Pool':'مسبح خاص',
-      'Rose':'وردي','Sand':'رملي','White':'أبيض','Grey':'رمادي','Padel':'بادل','Tennis':'تنس','Football':'كرة القدم','Basketball':'كرة السلة','Water sports':'رياضات مائية','Volleyball':'كرة الطائرة',
-      'Spa & Gym':'سبا ونادٍ رياضي',"Children's Club":'نادي الأطفال','Social Lounge':'صالة اجتماعية','Ladies Facilities':'مرافق للسيدات','Picnic Areas':'مناطق نزهات','Beach Club':'نادي شاطئي','Restaurants':'مطاعم','Cafes':'مقاهٍ','Retail':'متاجر',
-      'Car':'السيارة','Air':'الطائرة','Walking':'المشي','Cycling':'ركوب الدراجة','Private Buggy':'عربة خاصة','Shared Buggy / Community Shuttle':'عربة مشتركة / حافلة مجتمعية','Personal Car':'السيارة الشخصية',
-      'Yes':'نعم','Depends on return':'يعتمد على العائد','Depends on fees & flexibility':'يعتمد على الرسوم والمرونة'
+      'Under 25':'أقل من ٢٥','25–34':'٢٥–٣٤','35–44':'٣٥–٤٤','45–54':'٤٥–٥٤','55–64':'٥٥–٦٤','65+':'٦٥ فأكثر','Single':'أعزب','Married':'متزوج','No':'لا',
+      'Family holidays':'قضاء الإجازات العائلية','Investment':'الاستثمار','Both':'كلاهما','Apartment':'شقة','Townhouse':'تاون هاوس','Villa':'فيلا','Beach Villa':'فيلا شاطئية','No preference':'ليس لدي تفضيل',
+      'Studio':'استوديو','1BR':'غرفة نوم واحدة','2BR':'غرفتا نوم','3BR':'٣ غرف نوم','4BR':'٤ غرف نوم','5BR+':'٥ غرف نوم فأكثر',
+      'Cash upfront':'دفع المبلغ كاملًا مقدمًا','1–2 years':'خلال سنة إلى سنتين','3–5 years':'خلال ٣–٥ سنوات','5+ years':'خلال ٥ سنوات فأكثر',
+      'Outdoor Space':'مساحات خارجية','Balconies & Terraces':'شرفات وتراسات','Sea Views':'إطلالات بحرية','Park Views':'إطلالات على الحدائق','Privacy':'الخصوصية','Other':'أخرى','Other colours':'لون آخر',
+      "Maid's room":'غرفة للعاملة المنزلية',"Driver's room":'غرفة للسائق','Not required':'غير مطلوب','2030 onwards':'٢٠٣٠ وما بعد','2026–2027':'٢٠٢٦–٢٠٢٧','2028–2029':'٢٠٢٨–٢٠٢٩',
+      'Installed Kitchen':'مطبخ مُجهز','Kitchen Appliances':'أجهزة المطبخ','Built-in Wardrobes':'خزائن ملابس مدمجة','Private Pool':'مسبح خاص',
+      'Rose':'وردي','Sand':'رملي','Sage':'أخضر فاتح','Blue':'أزرق','Padel':'بادل','Tennis':'التنس','Football':'كرة القدم','Basketball':'كرة السلة','Water sports':'رياضات مائية','Volleyball':'كرة الطائرة',
+      'Spa':'سبا (مركز للاسترخاء والعناية)','Gym':'نادٍ رياضي',"Children's Club":'نادٍ للأطفال','Social Lounge':'صالة اجتماعية','Ladies Facilities':'مرافق للسيدات','Picnic Areas':'مناطق للتنزه','Beach Club':'نادٍ شاطئي','Restaurants':'مطاعم','Cafes':'مقاهي','Retail':'محلات تجارية',
+      'Car':'السيارة','Air':'الطائرة','Walking':'المشي','Cycling':'الدراجة','Private Buggy':'عربة قولف خاصة','Shared Buggy or Shuttle':'عربة قولف أو حافلة مشتركة','Personal Car':'سيارة خاصة',
+      'Yes':'نعم','Depends on return':'يعتمد على العائد المتوقع','Depends on fees':'يعتمد على الرسوم'
     };
     const AR_UI = {
       welcomeTitle:'ساهم في تشكيل مجتمع ساحلي جديد في البحر الأحمر', welcomeLead:'تخيّل منزلاً ثانياً ساحلياً صُمم حول أسلوب الحياة الذي تريده بجوار البحر.',
