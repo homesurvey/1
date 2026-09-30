@@ -535,6 +535,14 @@
       transition: background 0.2s var(--ease), border-color 0.2s var(--ease), color 0.2s var(--ease), box-shadow 0.2s var(--ease);
       -webkit-tap-highlight-color: transparent;
     }
+    .choice-chip .choice-label { font-weight: 600; }
+    .choice-chip .choice-hint {
+      margin-inline-start: 7px;
+      color: var(--muted);
+      font: italic 400 0.88em/1.35 Georgia, serif;
+      white-space: nowrap;
+    }
+    .choice-chip.is-on .choice-hint { color: color-mix(in srgb, var(--gold-dark) 68%, var(--muted)); }
 
     .choice-list.is-badges .choice-chip {
       width: auto;
@@ -1014,7 +1022,13 @@
         key: 'property_type',
         type: 'single',
         icon: '<path d="M3 21h18"/><path d="M5 21V10l7-5 7 5v11"/><path d="M9 21v-6h6v6"/>',
-        options: ['Apartment', 'Townhouse', 'Villa', 'Beach Villa', 'No preference']
+        options: [
+          { value: 'Apartment', hint: 'Starting at SAR 700K' },
+          { value: 'Townhouse', hint: 'Starting at SAR 2M' },
+          { value: 'Villa', hint: 'Starting at SAR 6M' },
+          { value: 'Beach Villa', hint: 'Starting at SAR 12M' },
+          'No preference'
+        ]
       },
 {
         title: 'Preferred Unit Size',
@@ -1036,7 +1050,8 @@
         key: 'price_range',
         type: 'single',
         icon: '<circle cx="12" cy="12" r="9"/><path d="M12 6v12"/><path d="M15 9.5c0-1.4-1.3-2.5-3-2.5s-3 1.1-3 2.5 1.3 2.2 3 2.5 3 1.1 3 2.5-1.3 2.5-3 2.5-3-1.1-3-2.5"/>',
-        options: ['700k–1.5M SAR', '1.5M–3M SAR', '3M–6M SAR', '6M+ SAR']
+        options: ['700K+', '2M+', '6M+', '12M+'],
+        skipIf: () => true
       },
 {
         title: 'Preferred Payment Plan',
@@ -1174,6 +1189,12 @@
       'Car':'السيارة','Air':'الطائرة','Walking':'المشي','Cycling':'الدراجة','Private Buggy':'عربة قولف خاصة','Shared Buggy or Shuttle':'عربة قولف أو حافلة مشتركة','Personal Car':'سيارة خاصة',
       'Yes':'نعم','Depends on return':'يعتمد على العائد المتوقع','Depends on fees':'يعتمد على الرسوم'
     };
+    const AR_PROPERTY_HINTS = {
+      'Apartment':'ابتداءً من ٧٠٠ ألف ريال',
+      'Townhouse':'ابتداءً من مليوني ريال',
+      'Villa':'ابتداءً من ٦ ملايين ريال',
+      'Beach Villa':'ابتداءً من ١٢ مليون ريال'
+    };
     const AR_UI = {
       welcomeTitle:'ساهم في تشكيل مجتمع ساحلي جديد في البحر الأحمر', welcomeLead:'تخيّل منزلاً ثانياً ساحلياً صُمم حول أسلوب الحياة الذي تريده بجوار البحر.',
       letsGo:'لنبدأ', continue:'متابعة', back:'رجوع', confirm:'تأكيد الإرسال', thankTitle:'شكراً لك',
@@ -1239,6 +1260,10 @@
 
     function optionLabel(opt) {
       return typeof opt === 'string' ? opt : (opt.label || opt.value);
+    }
+
+    function optionHint(opt) {
+      return typeof opt === 'string' ? '' : (opt.hint || '');
     }
 
     function hasOther(q) {
@@ -1366,6 +1391,7 @@
       const chips = q.options.map(opt => {
         const value = optionValue(opt);
         const label = optionLabel(opt);
+        const hint = optionHint(opt);
         const safe = value.replace(/"/g, '&quot;');
         if (isImages && opt.image) {
           return `<button type="button" class="choice-chip is-image" data-value="${safe}" aria-pressed="false" aria-label="${label}">
@@ -1374,7 +1400,8 @@
           </button>`;
         }
         const otherClass = isImages && value === 'Other' ? ' is-image-other' : '';
-        return `<button type="button" class="choice-chip${otherClass}" data-value="${safe}" aria-pressed="false">${label}</button>`;
+        const hintMarkup = hint ? `<span class="choice-hint">${hint}</span>` : '';
+        return `<button type="button" class="choice-chip${otherClass}" data-value="${safe}" aria-pressed="false"><span class="choice-label">${label}</span>${hintMarkup}</button>`;
       }).join('');
       let otherField = '';
       if (hasOther(q)) {
@@ -1456,6 +1483,7 @@
           const opt = q.options[optionIndex]; const value = optionValue(opt); const englishLabel = optionLabel(opt);
           const label = localizedOption(value, isArabic ? AR_OPTIONS[englishLabel] : englishLabel);
           const labelEl = chip.querySelector('.choice-label'); if (labelEl) labelEl.textContent = label; else chip.textContent = label;
+          const hintEl = chip.querySelector('.choice-hint'); if (hintEl) hintEl.textContent = isArabic ? (AR_PROPERTY_HINTS[value] || optionHint(opt)) : optionHint(opt);
           chip.setAttribute('aria-label', label); const img = chip.querySelector('img'); if (img) img.alt = label;
         });
         const textInput = screen.querySelector('.text-input');
@@ -1512,7 +1540,7 @@
 
     function clearSkippedAnswers() {
       QUESTIONS.forEach((q, i) => {
-        if (!isQuestionVisible(i)) answers[i] = q.type === 'multi' ? [] : '';
+        if (!isQuestionVisible(i) && q.key !== 'price_range') answers[i] = q.type === 'multi' ? [] : '';
       });
     }
 
@@ -1762,6 +1790,14 @@
           syncQuestionUI(qIndex);
           if (q.key === 'property_type') {
             const unitIndex = QUESTIONS.findIndex(item => item.key === 'unit_size');
+            const priceRangeIndex = QUESTIONS.findIndex(item => item.key === 'price_range');
+            const priceRangeByProperty = {
+              'Apartment': '700K+',
+              'Townhouse': '2M+',
+              'Villa': '6M+',
+              'Beach Villa': '12M+'
+            };
+            if (priceRangeIndex >= 0) answers[priceRangeIndex] = priceRangeByProperty[value] || '';
             if (unitIndex >= 0) syncQuestionUI(unitIndex);
           }
           if (value !== 'Other' && !isLastVisibleQuestion(qIndex)) {
